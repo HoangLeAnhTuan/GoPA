@@ -1,0 +1,22 @@
+{
+  "title": "家計",
+  "description": "お金の流れを把握し、意図的な支出を続けましょう。",
+  "netWorth": "純資産",
+  "netWorthDescription": "有効なすべての口座の合計",
+  "income": "今月の収入",
+  "expenses": "今月の支出",
+  "cashflow": "今月のキャッシュフロー",
+  "thisMonth": "今月",
+  "savingsRate": "貯蓄率: {{value}}%",
+  "spending": "カテゴリ別の支出",
+  "emptySpending": "今月はまだ支出がありません。",
+  "types": { "INCOME": "収入", "EXPENSE": "支出", "TRANSFER": "振替" },
+  "accountTypes": { "CASH": "現金", "BANK": "銀行", "CREDIT_CARD": "クレジットカード", "SAVINGS": "貯蓄", "INVESTMENT": "投資", "CRYPTO": "暗号資産" },
+  "currencies": { "VND": "VND — ベトナムドン", "USD": "USD — 米ドル", "EUR": "EUR — ユーロ", "JPY": "JPY — 日本円", "GBP": "GBP — 英ポンド", "KRW": "KRW — 韓国ウォン", "SGD": "SGD — シンガポールドル" },
+  "colors": { "emerald": "エメラルド", "amber": "アンバー", "blue": "ブルー", "rose": "ローズ", "purple": "パープル", "cyan": "シアン" },
+  "popularCategories": { "food": "食費", "transport": "交通", "shopping": "買い物", "income": "給与・収入", "entertainment": "娯楽", "savings": "貯蓄・投資" },
+  "quickAdd": { "title": "取引を追加", "description": "ダッシュボードを離れずに収入・支出・振替を記録します。", "accountRequired": "まず口座を作成すると、取引を追加できます。", "type": "種類", "amount": "金額", "account": "出金元口座", "toAccount": "入金先口座", "selectAccount": "口座を選択", "category": "カテゴリ", "uncategorized": "未分類", "description": "説明", "descriptionPlaceholder": "何のための取引ですか？", "currency": "通貨", "save": "取引を保存", "saving": "保存中…" },
+  "accounts": { "title": "口座", "name": "口座名", "type": "口座の種類", "balance": "開始残高", "add": "口座を追加", "namePlaceholder": "例: 三菱UFJ銀行" },
+  "categories": { "title": "カテゴリ", "name": "カテゴリ名", "type": "カテゴリの種類", "color": "色", "add": "カテゴリを追加", "namePlaceholder": "カテゴリ名…", "popularHint": "人気カテゴリをすばやく追加:", "customToggleOpen": "カテゴリをカスタマイズ", "customToggleClose": "閉じる" },
+  "recent": { "title": "最近の取引", "empty": "最近の取引がここに表示されます。" }
+}

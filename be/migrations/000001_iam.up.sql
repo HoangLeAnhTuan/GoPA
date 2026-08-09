@@ -1,0 +1,10 @@
+CREATE EXTENSION IF NOT EXISTS citext;
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    email CITEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'USER' CHECK (role IN ('USER', 'ADMIN')),
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
+);

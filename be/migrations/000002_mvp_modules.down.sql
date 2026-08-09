@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS outbox_events;
+DROP TABLE IF EXISTS processed_events;
+DROP TABLE IF EXISTS journals;
+DROP TABLE IF EXISTS pomodoro_history;
+DROP TABLE IF EXISTS network_nodes;
+DROP TABLE IF EXISTS vehicle_logs;
+DROP TABLE IF EXISTS vehicles;
+DROP TABLE IF EXISTS vocabulary_reviews;
+DROP TABLE IF EXISTS vocabularies;
+DROP TABLE IF EXISTS tasks;

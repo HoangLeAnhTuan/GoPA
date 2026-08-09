@@ -1,0 +1,22 @@
+{
+  "title": "Finance",
+  "description": "See where your money is going and keep every movement intentional.",
+  "netWorth": "Net worth",
+  "netWorthDescription": "Across active accounts",
+  "income": "Income this month",
+  "expenses": "Expenses this month",
+  "cashflow": "Monthly cashflow",
+  "thisMonth": "This month",
+  "savingsRate": "Savings rate: {{value}}%",
+  "spending": "Spending by category",
+  "emptySpending": "No expenses have been recorded this month.",
+  "types": { "INCOME": "Income", "EXPENSE": "Expense", "TRANSFER": "Transfer" },
+  "accountTypes": { "CASH": "Cash", "BANK": "Bank", "CREDIT_CARD": "Credit card", "SAVINGS": "Savings", "INVESTMENT": "Investment", "CRYPTO": "Crypto" },
+  "currencies": { "VND": "VND — Vietnamese đồng", "USD": "USD — US dollar", "EUR": "EUR — Euro", "JPY": "JPY — Japanese yen", "GBP": "GBP — British pound", "KRW": "KRW — South Korean won", "SGD": "SGD — Singapore dollar" },
+  "colors": { "emerald": "Emerald", "amber": "Amber", "blue": "Blue", "rose": "Rose", "purple": "Purple", "cyan": "Cyan" },
+  "popularCategories": { "food": "Food & dining", "transport": "Transport", "shopping": "Shopping", "income": "Salary & income", "entertainment": "Entertainment", "savings": "Savings & investment" },
+  "quickAdd": { "title": "Add transaction", "description": "Record income, spending, or a transfer without leaving your dashboard.", "accountRequired": "Create an account first, then you can add a transaction.", "type": "Type", "amount": "Amount", "account": "From account", "toAccount": "To account", "selectAccount": "Select an account", "category": "Category", "uncategorized": "Uncategorized", "description": "Description", "descriptionPlaceholder": "What was this for?", "currency": "Currency", "save": "Save transaction", "saving": "Saving…" },
+  "accounts": { "title": "Accounts", "name": "Account name", "type": "Account type", "balance": "Opening balance", "add": "Add account", "namePlaceholder": "e.g. Chase Checking" },
+  "categories": { "title": "Categories", "name": "Category name", "type": "Category type", "color": "Color", "add": "Add category", "namePlaceholder": "Category name…", "popularHint": "Quick-add popular categories:", "customToggleOpen": "Custom category", "customToggleClose": "Close custom" },
+  "recent": { "title": "Recent transactions", "empty": "Your latest transactions will appear here." }
+}

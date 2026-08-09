@@ -1,0 +1,22 @@
+{
+  "title": "Tài chính",
+  "description": "Theo dõi dòng tiền và đưa ra lựa chọn chi tiêu có chủ đích.",
+  "netWorth": "Tài sản ròng",
+  "netWorthDescription": "Từ tất cả tài khoản đang hoạt động",
+  "income": "Thu nhập tháng này",
+  "expenses": "Chi tiêu tháng này",
+  "cashflow": "Dòng tiền tháng này",
+  "thisMonth": "Tháng này",
+  "savingsRate": "Tỷ lệ tiết kiệm: {{value}}%",
+  "spending": "Chi tiêu theo danh mục",
+  "emptySpending": "Chưa có khoản chi nào trong tháng này.",
+  "types": { "INCOME": "Thu nhập", "EXPENSE": "Chi tiêu", "TRANSFER": "Chuyển tiền" },
+  "accountTypes": { "CASH": "Tiền mặt", "BANK": "Ngân hàng", "CREDIT_CARD": "Thẻ tín dụng", "SAVINGS": "Tiết kiệm", "INVESTMENT": "Đầu tư", "CRYPTO": "Tiền mã hóa" },
+  "currencies": { "VND": "VND — Đồng Việt Nam", "USD": "USD — Đô la Mỹ", "EUR": "EUR — Euro", "JPY": "JPY — Yên Nhật", "GBP": "GBP — Bảng Anh", "KRW": "KRW — Won Hàn Quốc", "SGD": "SGD — Đô la Singapore" },
+  "colors": { "emerald": "Xanh ngọc", "amber": "Hổ phách", "blue": "Xanh dương", "rose": "Hồng", "purple": "Tím", "cyan": "Xanh lam" },
+  "popularCategories": { "food": "Ăn uống", "transport": "Di chuyển", "shopping": "Mua sắm", "income": "Lương & thu nhập", "entertainment": "Giải trí", "savings": "Tiết kiệm & đầu tư" },
+  "quickAdd": { "title": "Thêm giao dịch", "description": "Ghi lại thu nhập, chi tiêu hoặc chuyển tiền ngay trên bảng điều khiển.", "accountRequired": "Hãy tạo tài khoản trước, sau đó bạn có thể thêm giao dịch.", "type": "Loại", "amount": "Số tiền", "account": "Tài khoản nguồn", "toAccount": "Tài khoản nhận", "selectAccount": "Chọn tài khoản", "category": "Danh mục", "uncategorized": "Chưa phân loại", "description": "Mô tả", "descriptionPlaceholder": "Khoản này dùng cho việc gì?", "currency": "Tiền tệ", "save": "Lưu giao dịch", "saving": "Đang lưu…" },
+  "accounts": { "title": "Tài khoản", "name": "Tên tài khoản", "type": "Loại tài khoản", "balance": "Số dư ban đầu", "add": "Thêm tài khoản", "namePlaceholder": "VD: VietcomBank" },
+  "categories": { "title": "Danh mục", "name": "Tên danh mục", "type": "Loại danh mục", "color": "Màu sắc", "add": "Thêm danh mục", "namePlaceholder": "Tên danh mục…", "popularHint": "Chọn nhanh danh mục phổ biến:", "customToggleOpen": "Tùy chỉnh danh mục", "customToggleClose": "Đóng tùy chỉnh" },
+  "recent": { "title": "Giao dịch gần đây", "empty": "Các giao dịch mới nhất sẽ xuất hiện ở đây." }
+}

@@ -1,0 +1,1 @@
+{"title":"集中作業","description":"大切な作業を記録、整理、完了します。","form":{"title":"タスク名","placeholder":"何に集中しますか？","add":"タスクを追加"},"status":{"TODO":"未着手","IN_PROGRESS":"進行中","DONE":"完了"},"priority":{"low":"低","medium":"中","high":"高"},"category":{"work":"仕事","study":"学習","life":"生活"},"actions":{"move":"次へ移動","delete":"タスクを削除"},"complete":"完了","empty":"まだタスクはありません。"}

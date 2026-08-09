@@ -1,0 +1,3 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getPomodoro, setPomodoro, stopPomodoro, type PomodoroState } from "../api/pomodoro-api";
+const key=["pomodoro"] as const; export function usePomodoro(){return useQuery({queryKey:key,queryFn:getPomodoro,refetchInterval:30_000});} export function useSetPomodoro(){const c=useQueryClient();return useMutation({mutationFn:(state:PomodoroState)=>setPomodoro(state),onSuccess:()=>c.invalidateQueries({queryKey:key})});} export function useStopPomodoro(){const c=useQueryClient();return useMutation({mutationFn:stopPomodoro,onSuccess:()=>c.invalidateQueries({queryKey:key})});}

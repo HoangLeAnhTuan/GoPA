@@ -1,0 +1,1 @@
+export function LoadingState() { return <div aria-busy="true" className="space-y-4"><div className="h-8 w-48 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800"/><div className="h-48 animate-pulse rounded-2xl bg-slate-200/80 dark:bg-slate-800/80"/></div>; }
