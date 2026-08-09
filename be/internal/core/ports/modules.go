@@ -46,11 +46,14 @@ type NetworkRepository interface {
 }
 
 type JournalRepository interface {
-	List(context.Context, uuid.UUID, string, string, int) ([]domain.Journal, error)
+	List(context.Context, uuid.UUID, domain.JournalFilter) ([]domain.Journal, error)
 	Get(context.Context, uuid.UUID, uuid.UUID) (domain.Journal, error)
 	Create(context.Context, domain.Journal) (domain.Journal, error)
 	Update(context.Context, domain.Journal) (domain.Journal, error)
 	Delete(context.Context, uuid.UUID, uuid.UUID) error
+	Link(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) error
+	Unlink(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) error
+	Stats(context.Context, uuid.UUID) (domain.JournalStats, error)
 }
 
 type PomodoroStore interface {

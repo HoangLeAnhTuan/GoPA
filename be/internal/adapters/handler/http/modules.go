@@ -53,7 +53,11 @@ func (h *ModuleHandler) RegisterRoutes(api *gin.RouterGroup, authenticate gin.Ha
 	protected.PUT("/pomodoro", h.setPomodoro)
 	protected.POST("/pomodoro/stop", h.stopPomodoro)
 	protected.GET("/journals", h.listJournals)
+	protected.GET("/journals/search", h.listJournals)
+	protected.GET("/journals/stats", h.journalStats)
 	protected.POST("/journals", h.createJournal)
+	protected.POST("/journals/:id/link", h.linkJournal)
+	protected.DELETE("/journals/:id/link/:linked_id", h.unlinkJournal)
 	protected.GET("/journals/:id", h.getJournal)
 	protected.PATCH("/journals/:id", h.updateJournal)
 	protected.DELETE("/journals/:id", h.deleteJournal)
@@ -256,8 +260,62 @@ func (h *ModuleHandler) stopPomodoro(c *gin.Context) {
 }
 
 func (h *ModuleHandler) listJournals(c *gin.Context) {
-	values, err := h.journals.List(c, userID(c), c.Query("q"), c.Query("tag"), limit(c))
+	tag := c.Query("tag")
+	if tag == "" {
+		tag = c.Query("tags")
+	}
+	filter := domain.JournalFilter{Term: c.Query("q"), Tag: tag, Limit: limit(c)}
+	if value := c.Query("mood"); value != "" {
+		mood := domain.JournalMood(value)
+		filter.Mood = &mood
+	}
+	if value := c.Query("from"); value != "" {
+		if parsed, err := time.Parse("2006-01-02", value); err == nil {
+			filter.From = &parsed
+		} else {
+			respond(c, nil, domain.ErrValidation, http.StatusBadRequest)
+			return
+		}
+	}
+	if value := c.Query("to"); value != "" {
+		if parsed, err := time.Parse("2006-01-02", value); err == nil {
+			filter.To = &parsed
+		} else {
+			respond(c, nil, domain.ErrValidation, http.StatusBadRequest)
+			return
+		}
+	}
+	values, err := h.journals.List(c, userID(c), filter)
 	respond(c, values, err, http.StatusOK)
+}
+func (h *ModuleHandler) journalStats(c *gin.Context) {
+	value, err := h.journals.Stats(c, userID(c))
+	respond(c, value, err, http.StatusOK)
+}
+func (h *ModuleHandler) linkJournal(c *gin.Context) {
+	journalID, ok := parameterUUID(c)
+	if !ok {
+		return
+	}
+	var request struct {
+		LinkedID uuid.UUID `json:"linked_id" binding:"required"`
+	}
+	if !bind(c, &request) {
+		return
+	}
+	respond(c, gin.H{}, h.journals.Link(c, userID(c), journalID, request.LinkedID), http.StatusOK)
+}
+func (h *ModuleHandler) unlinkJournal(c *gin.Context) {
+	journalID, ok := parameterUUID(c)
+	if !ok {
+		return
+	}
+	linkedID, err := uuid.Parse(c.Param("linked_id"))
+	if err != nil {
+		writeError(c, domain.ErrValidation)
+		return
+	}
+	respond(c, gin.H{}, h.journals.Unlink(c, userID(c), journalID, linkedID), http.StatusOK)
 }
 func (h *ModuleHandler) getJournal(c *gin.Context) {
 	id, ok := parameterUUID(c)
@@ -367,13 +425,15 @@ func (r networkNodeRequest) node() domain.NetworkNode {
 }
 
 type journalRequest struct {
-	Title   string   `json:"title" binding:"required,max=300"`
-	Content string   `json:"content"`
-	Tags    []string `json:"tags"`
+	Title         string              `json:"title" binding:"required,max=300"`
+	Content       string              `json:"content"`
+	Tags          []string            `json:"tags"`
+	Mood          *domain.JournalMood `json:"mood"`
+	PublishedDate *time.Time          `json:"published_date"`
 }
 
 func (r journalRequest) input() services.JournalInput {
-	return services.JournalInput{Title: r.Title, Content: r.Content, Tags: r.Tags}
+	return services.JournalInput{Title: r.Title, Content: r.Content, Tags: r.Tags, Mood: r.Mood, PublishedDate: r.PublishedDate}
 }
 
 func userID(c *gin.Context) uuid.UUID { identity, _ := identityFromContext(c); return identity.UserID }

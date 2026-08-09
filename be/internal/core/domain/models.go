@@ -222,14 +222,43 @@ func (n *NetworkNode) Validate() error {
 	return nil
 }
 
+type JournalMood string
+
+const (
+	JournalMoodVeryNegative JournalMood = "VERY_NEGATIVE"
+	JournalMoodNegative     JournalMood = "NEGATIVE"
+	JournalMoodNeutral      JournalMood = "NEUTRAL"
+	JournalMoodPositive     JournalMood = "POSITIVE"
+	JournalMoodVeryPositive JournalMood = "VERY_POSITIVE"
+)
+
 type Journal struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	UserID    uuid.UUID `json:"user_id" db:"user_id"`
-	Title     string    `json:"title" db:"title"`
-	Content   string    `json:"content" db:"content"`
-	Tags      []string  `json:"tags" db:"tags"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	ID            uuid.UUID    `json:"id" db:"id"`
+	UserID        uuid.UUID    `json:"user_id" db:"user_id"`
+	Title         string       `json:"title" db:"title"`
+	Content       string       `json:"content" db:"content"`
+	Tags          []string     `json:"tags" db:"tags"`
+	Mood          *JournalMood `json:"mood,omitempty" db:"mood"`
+	PublishedDate time.Time    `json:"published_date" db:"published_date"`
+	CreatedAt     time.Time    `json:"created_at" db:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at" db:"updated_at"`
+}
+
+type JournalFilter struct {
+	Term  string
+	Tag   string
+	Mood  *JournalMood
+	From  *time.Time
+	To    *time.Time
+	Limit int
+}
+
+type JournalStats struct {
+	CurrentStreak int                 `json:"current_streak"`
+	LongestStreak int                 `json:"longest_streak"`
+	WordCount     int                 `json:"word_count"`
+	Entries       int                 `json:"entries"`
+	MoodCounts    map[JournalMood]int `json:"mood_counts"`
 }
 
 type PomodoroStatus string
@@ -266,7 +295,7 @@ type PomodoroHistory struct {
 }
 
 func (j *Journal) Validate() error {
-	if len(strings.TrimSpace(j.Title)) == 0 || len(j.Title) > 300 || len(j.Content) > 100000 || len(j.Tags) > 20 {
+	if len(strings.TrimSpace(j.Title)) == 0 || len(j.Title) > 300 || len(j.Content) > 100000 || len(j.Tags) > 20 || j.PublishedDate.IsZero() || !validJournalMood(j.Mood) {
 		return ErrValidation
 	}
 	seen := map[string]bool{}
@@ -279,6 +308,40 @@ func (j *Journal) Validate() error {
 		j.Tags[index] = tag
 	}
 	return nil
+}
+
+func validJournalMood(mood *JournalMood) bool {
+	return mood == nil || *mood == JournalMoodVeryNegative || *mood == JournalMoodNegative || *mood == JournalMoodNeutral || *mood == JournalMoodPositive || *mood == JournalMoodVeryPositive
+}
+
+func CalculateJournalStreaks(dates []time.Time, today time.Time) (current, longest int) {
+	seen := make(map[time.Time]struct{}, len(dates))
+	for _, date := range dates {
+		seen[calendarDate(date)] = struct{}{}
+	}
+	for date := calendarDate(today); ; date = date.AddDate(0, 0, -1) {
+		if _, ok := seen[date]; !ok {
+			break
+		}
+		current++
+	}
+	for date := range seen {
+		length := 1
+		for next := date.AddDate(0, 0, 1); ; next = next.AddDate(0, 0, 1) {
+			if _, ok := seen[next]; !ok {
+				break
+			}
+			length++
+		}
+		if length > longest {
+			longest = length
+		}
+	}
+	return current, longest
+}
+
+func calendarDate(value time.Time) time.Time {
+	return time.Date(value.UTC().Year(), value.UTC().Month(), value.UTC().Day(), 0, 0, 0, 0, time.UTC)
 }
 
 func ParseCost(raw string) error {

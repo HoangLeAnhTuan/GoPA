@@ -97,14 +97,18 @@ export function AppLayout() {
       </aside>
 
       <div className={cn("flex h-dvh min-w-0 flex-col transition-[padding] duration-300 sm:pl-[16.5rem]", collapsed && "sm:pl-[6.5rem]")}>
-        <header className="relative z-10 mx-3 mt-3 flex min-h-14 shrink-0 items-center justify-between gap-3 rounded-2xl border border-white/60 bg-white/70 px-4 shadow-xl shadow-slate-950/5 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/70 sm:px-6">
+        <header className="relative z-10 mx-3 mt-1.5 flex h-11 shrink-0 items-center justify-between gap-3 rounded-xl border border-white/60 bg-white/75 px-3.5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/75 sm:px-5">
           <div className="flex min-w-0 items-center gap-3">
             <button aria-expanded={mobileOpen} aria-label={t("controls.openNavigation")} className="icon-button sm:hidden" onClick={() => setMobileOpen(true)} type="button"><Menu aria-hidden="true" size={19} /></button>
             <p className="truncate text-sm font-bold tracking-tight">GoPA</p>
           </div>
           <div className="flex shrink-0 items-center gap-1 sm:gap-3"><LanguageSwitcher /><ThemeSwitcher /></div>
         </header>
-        <main className="flex-1 overflow-y-auto overflow-x-hidden px-3 pb-20 pt-4 sm:px-5 sm:pb-8 sm:pt-5"><div className="mx-auto max-w-7xl"><Outlet /></div></main>
+        <main className="flex-1 min-h-0 flex flex-col overflow-hidden px-3 pb-3 pt-3 sm:px-4 sm:pb-4 sm:pt-3">
+          <div className="h-full w-full mx-auto max-w-[1600px] flex flex-col min-h-0 overflow-hidden">
+            <Outlet />
+          </div>
+        </main>
       </div>
       <PomodoroWidget />
     </div>

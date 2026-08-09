@@ -1,1 +1,62 @@
-{"title":"Journal","description":"Write and retrieve your Markdown knowledge.","new":"New entry","search":"Search journals","empty":"No journal entries yet.","emptyContent":"No content","form":{"title":"Title","tags":"Tags, separated by commas","content":"Write in Markdown…"},"save":"Save entry"}
+{
+  "title": "Journal",
+  "description": "Write and retrieve your Markdown knowledge.",
+  "new": "New Entry",
+  "newEntry": "Write New Entry",
+  "backToList": "Back to List",
+  "editTitle": "Edit Journal Entry",
+  "newTitle": "New Journal Entry",
+  "presetTagNotice": "Quick tag selector",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "chars": "chars",
+  "search": "Search entries by title or content...",
+  "empty": "No journal entries found.",
+  "emptyContent": "No content entered yet...",
+  "publishedDate": "Published Date",
+  "noEntries": "No entries match your filters.",
+  "mood": {
+    "label": "Emotional Mood",
+    "all": "All Moods",
+    "VERY_NEGATIVE": "Very Negative",
+    "NEGATIVE": "Negative",
+    "NEUTRAL": "Neutral",
+    "POSITIVE": "Positive",
+    "VERY_POSITIVE": "Very Positive"
+  },
+  "stats": {
+    "currentStreak": "Current Streak",
+    "longestStreak": "Longest Streak",
+    "entries": "Total Entries",
+    "wordCount": "Total Words",
+    "days": "days",
+    "words": "words",
+    "moodBreakdown": "Mood Overview"
+  },
+  "filters": {
+    "mood": "Mood Filter",
+    "allMoods": "All Emotional Moods",
+    "tag": "Filter by Tag",
+    "from": "Start Date",
+    "to": "End Date",
+    "clear": "Clear All Filters",
+    "search": "Search",
+    "toggle": "Filters",
+    "results": "result(s)"
+  },
+  "linking": {
+    "title": "Bi-Directional Journal Links",
+    "add": "Attach Link",
+    "select": "Select another journal entry to link...",
+    "none": "No linked entries attached",
+    "unlink": "Remove Link"
+  },
+  "form": {
+    "title": "Entry Title",
+    "tags": "Tags (e.g. architecture, refactor, study)",
+    "content": "Compose your Markdown notes here..."
+  },
+  "save": "Save Entry",
+  "delete": "Delete Entry",
+  "confirmDelete": "Delete this journal entry permanently?"
+}

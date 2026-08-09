@@ -1038,11 +1038,11 @@ make build           # go build ./cmd/api ./cmd/worker
 
 ### PHASE-5: Journal
 - [ ] **BE-501** Elasticsearch index setup + `journals` + `journal_links` migration
-- [ ] **BE-502** `search_vector` trigger
-- [ ] **BE-503** Journal repository + service
-- [ ] **BE-504** Journal CRUD + full-text search handlers
-- [ ] **BE-505** Journal linking endpoint
-- [ ] **BE-506** Journal stats (streak, word count, mood)
+- [x] **BE-502** `search_vector` trigger
+- [x] **BE-503** Journal repository + service
+- [x] **BE-504** Journal CRUD + full-text search handlers
+- [x] **BE-505** Journal linking endpoint
+- [x] **BE-506** Journal stats (streak, word count, mood)
 - [ ] **BE-507** Worker: journal indexing to Elasticsearch via AI service
 
 ---

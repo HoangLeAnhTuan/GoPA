@@ -1,1 +1,62 @@
-{"title":"ジャーナル","description":"Markdown の知識を書き、見つけます。","new":"新しい項目","search":"ジャーナルを検索","empty":"ジャーナル項目はありません。","emptyContent":"内容なし","form":{"title":"タイトル","tags":"タグ（カンマ区切り）","content":"Markdown で書く…"},"save":"項目を保存"}
+{
+  "title": "ジャーナル",
+  "description": "Markdown の知識を書き、見つけます。",
+  "new": "新しい項目",
+  "newEntry": "新規ジャーナル作成",
+  "backToList": "一覧に戻る",
+  "editTitle": "ジャーナル編集",
+  "newTitle": "新規ジャーナル作成",
+  "presetTagNotice": "クイックタグ選択",
+  "confirm": "確認",
+  "cancel": "キャンセル",
+  "chars": "文字",
+  "search": "タイトルや内容で検索...",
+  "empty": "ジャーナル項目が見つかりません。",
+  "emptyContent": "まだ内容が記述されていません...",
+  "publishedDate": "公開日",
+  "noEntries": "フィルターに一致する項目がありません。",
+  "mood": {
+    "label": "気分・感情",
+    "all": "すべての気分",
+    "VERY_NEGATIVE": "とても悪い",
+    "NEGATIVE": "悪い",
+    "NEUTRAL": "普通",
+    "POSITIVE": "良い",
+    "VERY_POSITIVE": "とても良い"
+  },
+  "stats": {
+    "currentStreak": "現在の連続日",
+    "longestStreak": "最長連続日",
+    "entries": "総エントリー数",
+    "wordCount": "総単語数",
+    "days": "日",
+    "words": "語",
+    "moodBreakdown": "気分概要"
+  },
+  "filters": {
+    "mood": "気分フィルター",
+    "allMoods": "すべての気分",
+    "tag": "タグで絞り込み",
+    "from": "開始日",
+    "to": "終了日",
+    "clear": "フィルターを解除",
+    "search": "検索",
+    "toggle": "フィルター",
+    "results": "件"
+  },
+  "linking": {
+    "title": "双方向関連リンク",
+    "add": "リンクを追加",
+    "select": "関連付けるジャーナル項目を選択...",
+    "none": "関連エントリーはありません",
+    "unlink": "リンク解除"
+  },
+  "form": {
+    "title": "エントリータイトル",
+    "tags": "タグ（例：設計、リファクタリング、学習）",
+    "content": "ここに Markdown メモを入力..."
+  },
+  "save": "エントリーを保存",
+  "delete": "エントリーを削除",
+  "confirmDelete": "このジャーナル項目を完全に削除しますか？"
+}
