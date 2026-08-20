@@ -8,19 +8,19 @@ import (
 	"strings"
 	"time"
 
+	"gopa/pkg/constants"
+
 	"github.com/gin-gonic/gin"
 )
 
-const requestIDKey = "request_id"
-
 func RequestID() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		requestID := strings.TrimSpace(c.GetHeader("X-Request-ID"))
+		requestID := strings.TrimSpace(c.GetHeader(constants.RequestIDHeader))
 		if len(requestID) == 0 || len(requestID) > 128 {
 			requestID = newRequestID()
 		}
-		c.Set(requestIDKey, requestID)
-		c.Header("X-Request-ID", requestID)
+		c.Set(constants.RequestIDKey, requestID)
+		c.Header(constants.RequestIDHeader, requestID)
 		c.Next()
 	}
 }
@@ -49,7 +49,7 @@ func CORS(origin string) gin.HandlerFunc {
 		}
 		if c.Request.Method == http.MethodOptions {
 			c.Header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
-			c.Header("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Request-ID")
+			c.Header("Access-Control-Allow-Headers", "Authorization, Content-Type, "+constants.RequestIDHeader)
 			c.Status(http.StatusNoContent)
 			return
 		}
@@ -58,7 +58,7 @@ func CORS(origin string) gin.HandlerFunc {
 }
 
 func requestID(c *gin.Context) string {
-	value, exists := c.Get(requestIDKey)
+	value, exists := c.Get(constants.RequestIDKey)
 	if requestID, ok := value.(string); exists && ok {
 		return requestID
 	}

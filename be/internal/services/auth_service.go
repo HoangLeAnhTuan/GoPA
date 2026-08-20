@@ -15,8 +15,14 @@ import (
 )
 
 type RegisterInput struct {
-	Email    string
-	Password string
+	Email       string
+	Password    string
+	DisplayName string
+}
+
+type UpdateProfileInput struct {
+	DisplayName *string
+	AvatarURL   *string
 }
 
 type LoginInput struct {
@@ -58,17 +64,66 @@ func (s *AuthService) Register(ctx context.Context, input RegisterInput) (domain
 	if err := validatePassword(input.Password); err != nil {
 		return domain.User{}, err
 	}
+	displayName := strings.TrimSpace(input.DisplayName)
+	if len(displayName) > 100 {
+		return domain.User{}, domain.ErrValidation
+	}
 	hash, err := utils.HashPassword(input.Password, s.bcryptCost)
 	if err != nil {
 		return domain.User{}, err
 	}
 	now := s.now().UTC()
-	user := domain.User{ID: uuid.New(), Email: email, PasswordHash: hash, Role: domain.RoleUser, CreatedAt: now, UpdatedAt: now}
+	user := domain.User{
+		ID:           uuid.New(),
+		Email:        email,
+		PasswordHash: hash,
+		DisplayName:  displayName,
+		Role:         domain.RoleUser,
+		CreatedAt:    now,
+		UpdatedAt:    now,
+	}
 	created, err := s.users.Create(ctx, user)
 	if err != nil {
 		return domain.User{}, fmt.Errorf("create user: %w", err)
 	}
 	return created, nil
+}
+
+func (s *AuthService) UpdateProfile(ctx context.Context, userID uuid.UUID, input UpdateProfileInput) (domain.User, error) {
+	user, err := s.users.FindByID(ctx, userID)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return domain.User{}, domain.ErrNotFound
+		}
+		return domain.User{}, fmt.Errorf("find profile user: %w", err)
+	}
+
+	if input.DisplayName != nil {
+		name := strings.TrimSpace(*input.DisplayName)
+		if len(name) > 100 {
+			return domain.User{}, domain.ErrValidation
+		}
+		user.DisplayName = name
+	}
+
+	if input.AvatarURL != nil {
+		avatar := strings.TrimSpace(*input.AvatarURL)
+		if avatar == "" {
+			user.AvatarURL = nil
+		} else {
+			if len(avatar) > 2048 {
+				return domain.User{}, domain.ErrValidation
+			}
+			user.AvatarURL = &avatar
+		}
+	}
+
+	user.UpdatedAt = s.now().UTC()
+	updated, err := s.users.Update(ctx, user)
+	if err != nil {
+		return domain.User{}, fmt.Errorf("update profile: %w", err)
+	}
+	return updated, nil
 }
 
 func (s *AuthService) Login(ctx context.Context, input LoginInput) (AuthResult, error) {

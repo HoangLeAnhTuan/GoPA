@@ -45,7 +45,19 @@ func TestHealthHandler_ReadinessReturnsServiceUnavailableWhenDependencyFails(t *
 }
 
 func newHealthTestRouter(readiness ReadinessChecker) *gin.Engine {
-	return NewRouter(slog.Default(), "http://localhost:5173", NewHealthHandler(readiness), NewAuthHandler(authServiceStub{}, time.Hour, false), nil, utils.NewTokenManager("gopa", "a secure test secret with enough characters", time.Hour), rateLimiterStub{})
+	return NewRouter(
+		slog.Default(),
+		"http://localhost:5173",
+		NewHealthHandler(readiness),
+		NewAuthHandler(authServiceStub{}, time.Hour, false),
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		utils.NewTokenManager("gopa", "a secure test secret with enough characters", time.Hour),
+		rateLimiterStub{},
+	)
 }
 
 type authServiceStub struct{}
@@ -61,6 +73,9 @@ func (authServiceStub) Refresh(context.Context, string) (services.AuthResult, er
 }
 func (authServiceStub) Logout(context.Context, string) error               { return nil }
 func (authServiceStub) Me(context.Context, uuid.UUID) (domain.User, error) { return domain.User{}, nil }
+func (authServiceStub) UpdateProfile(context.Context, uuid.UUID, services.UpdateProfileInput) (domain.User, error) {
+	return domain.User{}, nil
+}
 
 type rateLimiterStub struct{}
 

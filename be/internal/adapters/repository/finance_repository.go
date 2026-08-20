@@ -232,11 +232,50 @@ func (r *FinanceRepository) CreateTransaction(ctx context.Context, transaction d
 		if _, err := tx.NamedExecContext(ctx, `INSERT INTO transactions (`+transactionColumns+`) VALUES (:id, :user_id, :account_id, :to_account_id, :category_id, :type, :amount, :currency, :exchange_rate, :description, :merchant, :tags, :occurred_at, :is_recurring, :recurring_rule, :created_at, :updated_at)`, transactionParams(transaction)); err != nil {
 			return fmt.Errorf("insert transaction: %w", err)
 		}
-		return applyBalanceEffect(ctx, tx, transaction, false)
+		if err := applyBalanceEffect(ctx, tx, transaction, false); err != nil {
+			return err
+		}
+		return r.checkBudgetAlerts(ctx, tx, transaction)
 	}); err != nil {
 		return domain.Transaction{}, err
 	}
 	return transaction, nil
+}
+
+func (r *FinanceRepository) checkBudgetAlerts(ctx context.Context, tx *sqlx.Tx, transaction domain.Transaction) error {
+	if transaction.Type != domain.TransactionExpense || transaction.CategoryID == nil {
+		return nil
+	}
+	budgets := make([]domain.Budget, 0)
+	if err := tx.SelectContext(ctx, &budgets,
+		`SELECT `+budgetColumns+` FROM budgets WHERE user_id = $1 AND is_active = TRUE AND category_id = $2 AND start_date <= $3 AND end_date >= $3`,
+		transaction.UserID, *transaction.CategoryID, transaction.OccurredAt.UTC()); err != nil {
+		return fmt.Errorf("find active budgets for alert check: %w", err)
+	}
+
+	for _, budget := range budgets {
+		var spent decimal.Decimal
+		if err := tx.GetContext(ctx, &spent,
+			`SELECT COALESCE(SUM(amount * exchange_rate), 0) FROM transactions WHERE user_id = $1 AND type = 'EXPENSE' AND category_id = $2 AND occurred_at >= $3 AND occurred_at <= $4`,
+			transaction.UserID, *transaction.CategoryID, budget.StartDate.UTC(), budget.EndDate.UTC()); err != nil {
+			return fmt.Errorf("calculate spent for budget alert: %w", err)
+		}
+
+		if budget.Amount.IsPositive() {
+			utilization := spent.Div(budget.Amount)
+			if utilization.GreaterThanOrEqual(budget.AlertThreshold) {
+				eventID := uuid.New()
+				payload := fmt.Sprintf(`{"budget_id":"%s","user_id":"%s","category_id":"%s","spent_amount":"%s","budget_amount":"%s","utilization_rate":"%s"}`,
+					budget.ID, budget.UserID, *budget.CategoryID, spent.StringFixed(2), budget.Amount.StringFixed(2), utilization.StringFixed(4))
+				if _, err := tx.ExecContext(ctx,
+					`INSERT INTO outbox_events (id, event_type, routing_key, payload, occurred_at, created_at) VALUES ($1, 'finance.budget.alert', 'finance.budget.alert', $2, $3, $3)`,
+					eventID, payload, transaction.OccurredAt.UTC()); err != nil {
+					return fmt.Errorf("insert budget alert outbox event: %w", err)
+				}
+			}
+		}
+	}
+	return nil
 }
 
 func (r *FinanceRepository) UpdateTransaction(ctx context.Context, transaction domain.Transaction) (domain.Transaction, error) {
@@ -462,6 +501,33 @@ func requireAffected(result sql.Result, operation string) error {
 	}
 	if rows == 0 {
 		return domain.ErrNotFound
+	}
+	return nil
+}
+
+func (r *FinanceRepository) SeedDefaultCategories(ctx context.Context, userID uuid.UUID) error {
+	defaults := []domain.Category{
+		{ID: uuid.New(), UserID: userID, Name: "Salary", Type: domain.CategoryIncome, Icon: "💰", Color: "#22C55E"},
+		{ID: uuid.New(), UserID: userID, Name: "Freelance", Type: domain.CategoryIncome, Icon: "💻", Color: "#3B82F6"},
+		{ID: uuid.New(), UserID: userID, Name: "Food & Drinks", Type: domain.CategoryExpense, Icon: "🍜", Color: "#F59E0B"},
+		{ID: uuid.New(), UserID: userID, Name: "Transport", Type: domain.CategoryExpense, Icon: "🚌", Color: "#8B5CF6"},
+		{ID: uuid.New(), UserID: userID, Name: "Shopping", Type: domain.CategoryExpense, Icon: "🛍️", Color: "#EC4899"},
+		{ID: uuid.New(), UserID: userID, Name: "Housing", Type: domain.CategoryExpense, Icon: "🏠", Color: "#14B8A6"},
+		{ID: uuid.New(), UserID: userID, Name: "Healthcare", Type: domain.CategoryExpense, Icon: "🏥", Color: "#EF4444"},
+		{ID: uuid.New(), UserID: userID, Name: "Entertainment", Type: domain.CategoryExpense, Icon: "🎮", Color: "#F97316"},
+		{ID: uuid.New(), UserID: userID, Name: "Education", Type: domain.CategoryExpense, Icon: "📚", Color: "#6366F1"},
+		{ID: uuid.New(), UserID: userID, Name: "Travel", Type: domain.CategoryExpense, Icon: "✈️", Color: "#06B6D4"},
+	}
+	now := time.Now().UTC()
+	for i := range defaults {
+		defaults[i].CreatedAt = now
+		defaults[i].UpdatedAt = now
+	}
+	const query = `INSERT INTO categories (` + categoryColumns + `) VALUES (:id, :user_id, :name, :type, :icon, :color, :parent_id, :monthly_budget, :created_at, :updated_at) ON CONFLICT DO NOTHING`
+	for _, cat := range defaults {
+		if _, err := r.db.NamedExecContext(ctx, query, cat); err != nil {
+			return fmt.Errorf("seed default category %s: %w", cat.Name, err)
+		}
 	}
 	return nil
 }

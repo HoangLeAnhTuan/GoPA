@@ -20,27 +20,31 @@ const (
 	TaskPriorityLow      TaskPriority = "LOW"
 	TaskPriorityMedium   TaskPriority = "MEDIUM"
 	TaskPriorityHigh     TaskPriority = "HIGH"
+	TaskPriorityUrgent   TaskPriority = "URGENT"
 	TaskCategoryWork     TaskCategory = "WORK"
 	TaskCategoryStudy    TaskCategory = "STUDY"
 	TaskCategoryLife     TaskCategory = "LIFE"
+	TaskCategoryLeetcode TaskCategory = "LEETCODE"
 )
 
 type Task struct {
-	ID          uuid.UUID    `json:"id" db:"id"`
-	UserID      uuid.UUID    `json:"user_id" db:"user_id"`
-	Title       string       `json:"title" db:"title"`
-	Description string       `json:"description" db:"description"`
-	Status      TaskStatus   `json:"status" db:"status"`
-	Priority    TaskPriority `json:"priority" db:"priority"`
-	Category    TaskCategory `json:"category" db:"category"`
-	DueDate     *time.Time   `json:"due_date" db:"due_date"`
-	Position    int64        `json:"position" db:"position"`
-	CreatedAt   time.Time    `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time    `json:"updated_at" db:"updated_at"`
+	ID                 uuid.UUID    `json:"id" db:"id"`
+	UserID             uuid.UUID    `json:"user_id" db:"user_id"`
+	Title              string       `json:"title" db:"title"`
+	Description        string       `json:"description" db:"description"`
+	Status             TaskStatus   `json:"status" db:"status"`
+	Priority           TaskPriority `json:"priority" db:"priority"`
+	Category           TaskCategory `json:"category" db:"category"`
+	DueDate            *time.Time   `json:"due_date" db:"due_date"`
+	Position           int64        `json:"position" db:"position"`
+	EstimatedPomodoros int          `json:"estimated_pomodoros" db:"estimated_pomodoros"`
+	CompletedPomodoros int          `json:"completed_pomodoros" db:"completed_pomodoros"`
+	CreatedAt          time.Time    `json:"created_at" db:"created_at"`
+	UpdatedAt          time.Time    `json:"updated_at" db:"updated_at"`
 }
 
 func (t Task) Validate() error {
-	if len(strings.TrimSpace(t.Title)) == 0 || len(t.Title) > 200 || !validTaskStatus(t.Status) || !validPriority(t.Priority) || !validCategory(t.Category) {
+	if len(strings.TrimSpace(t.Title)) == 0 || len(t.Title) > 200 || !validTaskStatus(t.Status) || !validPriority(t.Priority) || !validCategory(t.Category) || t.EstimatedPomodoros < 0 || t.CompletedPomodoros < 0 {
 		return ErrValidation
 	}
 	return nil
@@ -50,10 +54,10 @@ func validTaskStatus(status TaskStatus) bool {
 	return status == TaskStatusTodo || status == TaskStatusInProgress || status == TaskStatusDone
 }
 func validPriority(priority TaskPriority) bool {
-	return priority == TaskPriorityLow || priority == TaskPriorityMedium || priority == TaskPriorityHigh
+	return priority == TaskPriorityLow || priority == TaskPriorityMedium || priority == TaskPriorityHigh || priority == TaskPriorityUrgent
 }
 func validCategory(category TaskCategory) bool {
-	return category == TaskCategoryWork || category == TaskCategoryStudy || category == TaskCategoryLife
+	return category == TaskCategoryWork || category == TaskCategoryStudy || category == TaskCategoryLife || category == TaskCategoryLeetcode
 }
 
 type VocabularyLanguage string
@@ -64,24 +68,69 @@ const (
 )
 
 type Vocabulary struct {
-	ID              uuid.UUID          `json:"id" db:"id"`
-	UserID          uuid.UUID          `json:"user_id" db:"user_id"`
-	Language        VocabularyLanguage `json:"language" db:"language"`
-	Word            string             `json:"word" db:"word"`
-	Reading         *string            `json:"reading" db:"reading"`
-	Meaning         string             `json:"meaning" db:"meaning"`
-	ExampleSentence *string            `json:"example_sentence" db:"example_sentence"`
-	CurrentBox      int16              `json:"current_box" db:"current_box"`
-	NextReviewAt    time.Time          `json:"next_review_at" db:"next_review_at"`
-	CreatedAt       time.Time          `json:"created_at" db:"created_at"`
-	UpdatedAt       time.Time          `json:"updated_at" db:"updated_at"`
+	ID                 uuid.UUID          `json:"id" db:"id"`
+	UserID             uuid.UUID          `json:"user_id" db:"user_id"`
+	Language           VocabularyLanguage `json:"language" db:"language"`
+	Word               string             `json:"word" db:"word"`
+	Reading            *string            `json:"reading" db:"reading"`
+	Meaning            string             `json:"meaning" db:"meaning"`
+	ExampleSentence    *string            `json:"example_sentence" db:"example_sentence"`
+	ExampleTranslation *string            `json:"example_translation" db:"example_translation"`
+	Tags               []string           `json:"tags" db:"tags"`
+	DifficultyLevel    string             `json:"difficulty_level" db:"difficulty_level"`
+	AudioURL           *string            `json:"audio_url,omitempty" db:"audio_url"`
+	ImageURL           *string            `json:"image_url,omitempty" db:"image_url"`
+	EaseFactor         float64            `json:"ease_factor" db:"ease_factor"`
+	IntervalDays       int                `json:"interval_days" db:"interval_days"`
+	RepetitionCount    int                `json:"repetition_count" db:"repetition_count"`
+	CurrentBox         int16              `json:"current_box" db:"current_box"`
+	NextReviewAt       time.Time          `json:"next_review_at" db:"next_review_at"`
+	MasteryScore       int16              `json:"mastery_score" db:"mastery_score"`
+	CreatedAt          time.Time          `json:"created_at" db:"created_at"`
+	UpdatedAt          time.Time          `json:"updated_at" db:"updated_at"`
 }
 
 func (v Vocabulary) Validate() error {
-	if (v.Language != VocabularyLanguageJapanese && v.Language != VocabularyLanguageEnglish) || len(strings.TrimSpace(v.Word)) == 0 || len(v.Word) > 300 || len(strings.TrimSpace(v.Meaning)) == 0 || len(v.Meaning) > 1000 || v.CurrentBox < 1 || v.CurrentBox > 5 {
+	if (v.Language != VocabularyLanguageJapanese && v.Language != VocabularyLanguageEnglish) ||
+		len(strings.TrimSpace(v.Word)) == 0 || len(v.Word) > 300 ||
+		len(strings.TrimSpace(v.Meaning)) == 0 || len(v.Meaning) > 1000 ||
+		v.CurrentBox < 1 || v.CurrentBox > 5 || v.MasteryScore < 0 || v.MasteryScore > 100 {
 		return ErrValidation
 	}
 	return nil
+}
+
+type VocabularyReview struct {
+	ID             uuid.UUID `json:"id" db:"id"`
+	EventID        uuid.UUID `json:"event_id" db:"event_id"`
+	VocabularyID   uuid.UUID `json:"vocabulary_id" db:"vocabulary_id"`
+	UserID         uuid.UUID `json:"user_id" db:"user_id"`
+	Quality        int16     `json:"quality" db:"quality"`
+	StudyMode      string    `json:"study_mode" db:"study_mode"`
+	ResponseTimeMs int       `json:"response_time_ms" db:"response_time_ms"`
+	WasCorrect     bool      `json:"was_correct" db:"was_correct"`
+	ReviewedAt     time.Time `json:"reviewed_at" db:"reviewed_at"`
+	CreatedAt      time.Time `json:"created_at" db:"created_at"`
+}
+
+type LearningSession struct {
+	ID              uuid.UUID          `json:"id" db:"id"`
+	UserID          uuid.UUID          `json:"user_id" db:"user_id"`
+	Language        VocabularyLanguage `json:"language" db:"language"`
+	SessionType     string             `json:"session_type" db:"session_type"`
+	ItemsReviewed   int                `json:"items_reviewed" db:"items_reviewed"`
+	ItemsCorrect    int                `json:"items_correct" db:"items_correct"`
+	DurationSeconds int                `json:"duration_seconds" db:"duration_seconds"`
+	StartedAt       time.Time          `json:"started_at" db:"started_at"`
+	EndedAt         *time.Time         `json:"ended_at,omitempty" db:"ended_at"`
+}
+
+type VocabularyStats struct {
+	TotalWords      int            `json:"total_words"`
+	MasteredWords   int            `json:"mastered_words"`
+	DueCount        int            `json:"due_count"`
+	BoxDistribution map[int16]int  `json:"box_distribution"`
+	ReviewHeatmap   map[string]int `json:"review_heatmap"`
 }
 
 type ReviewSchedule struct {
@@ -239,6 +288,9 @@ type Journal struct {
 	Content       string       `json:"content" db:"content"`
 	Tags          []string     `json:"tags" db:"tags"`
 	Mood          *JournalMood `json:"mood,omitempty" db:"mood"`
+	EnergyLevel   *int16       `json:"energy_level,omitempty" db:"energy_level"`
+	Pinned        bool         `json:"pinned" db:"pinned"`
+	WordCount     int          `json:"word_count" db:"word_count"`
 	PublishedDate time.Time    `json:"published_date" db:"published_date"`
 	CreatedAt     time.Time    `json:"created_at" db:"created_at"`
 	UpdatedAt     time.Time    `json:"updated_at" db:"updated_at"`
@@ -295,7 +347,7 @@ type PomodoroHistory struct {
 }
 
 func (j *Journal) Validate() error {
-	if len(strings.TrimSpace(j.Title)) == 0 || len(j.Title) > 300 || len(j.Content) > 100000 || len(j.Tags) > 20 || j.PublishedDate.IsZero() || !validJournalMood(j.Mood) {
+	if len(strings.TrimSpace(j.Title)) == 0 || len(j.Title) > 300 || len(j.Content) > 100000 || len(j.Tags) > 20 || j.PublishedDate.IsZero() || !validJournalMood(j.Mood) || (j.EnergyLevel != nil && (*j.EnergyLevel < 1 || *j.EnergyLevel > 5)) || j.WordCount < 0 {
 		return ErrValidation
 	}
 	seen := map[string]bool{}

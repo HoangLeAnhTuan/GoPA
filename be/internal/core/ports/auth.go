@@ -12,6 +12,7 @@ type UserRepository interface {
 	Create(context.Context, domain.User) (domain.User, error)
 	FindByID(context.Context, uuid.UUID) (domain.User, error)
 	FindByEmail(context.Context, string) (domain.User, error)
+	Update(context.Context, domain.User) (domain.User, error)
 }
 
 type RefreshSessionStore interface {

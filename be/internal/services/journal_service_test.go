@@ -88,6 +88,15 @@ func (m *mockJournalRepo) Stats(ctx context.Context, userID uuid.UUID) (domain.J
 	curr, long := domain.CalculateJournalStreaks(dates, time.Date(2026, 8, 9, 0, 0, 0, 0, time.UTC))
 	return domain.JournalStats{CurrentStreak: curr, LongestStreak: long, Entries: len(dates)}, nil
 }
+func (m *mockJournalRepo) Search(ctx context.Context, userID uuid.UUID, query string) ([]domain.Journal, error) {
+	results := make([]domain.Journal, 0)
+	for _, j := range m.journals {
+		if j.UserID == userID {
+			results = append(results, j)
+		}
+	}
+	return results, nil
+}
 
 func TestJournalService_Create_Validation(t *testing.T) {
 	repo := newMockJournalRepo()

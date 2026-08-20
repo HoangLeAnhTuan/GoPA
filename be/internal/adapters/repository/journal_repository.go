@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"gopa/internal/core/domain"
+	"gopa/internal/core/ports"
 	"gopa/pkg/database"
 )
 
@@ -22,12 +23,15 @@ type journalRow struct {
 	Content       string              `db:"content"`
 	Tags          []byte              `db:"tags"`
 	Mood          *domain.JournalMood `db:"mood"`
+	EnergyLevel   *int16              `db:"energy_level"`
+	Pinned        bool                `db:"pinned"`
+	WordCount     int                 `db:"word_count"`
 	PublishedDate time.Time           `db:"published_date"`
 	CreatedAt     time.Time           `db:"created_at"`
 	UpdatedAt     time.Time           `db:"updated_at"`
 }
 
-const journalColumns = "id, user_id, title, content, tags, mood, published_date, created_at, updated_at"
+const journalColumns = "id, user_id, title, content, tags, mood, energy_level, pinned, word_count, published_date, created_at, updated_at"
 
 func NewJournalRepository(db *sqlx.DB) *JournalRepository { return &JournalRepository{db: db} }
 
@@ -87,12 +91,18 @@ func (r *JournalRepository) write(ctx context.Context, j domain.Journal, eventTy
 	if err != nil {
 		return fmt.Errorf("marshal journal tags: %w", err)
 	}
+	// Auto-calculate word count from content
+	j.WordCount = len(strings.Fields(j.Content))
 	return database.WithTx(ctx, r.db, func(tx *sqlx.Tx) error {
 		var result sql.Result
 		if update {
-			result, err = tx.ExecContext(ctx, `UPDATE journals SET title=$1, content=$2, tags=$3, mood=$4, published_date=$5, updated_at=$6 WHERE id=$7 AND user_id=$8`, j.Title, j.Content, tags, j.Mood, j.PublishedDate, j.UpdatedAt, j.ID, j.UserID)
+			result, err = tx.ExecContext(ctx,
+				`UPDATE journals SET title=$1, content=$2, tags=$3, mood=$4, energy_level=$5, pinned=$6, word_count=$7, published_date=$8, updated_at=$9, search_vector=to_tsvector('english', $1 || ' ' || $2) WHERE id=$10 AND user_id=$11`,
+				j.Title, j.Content, tags, j.Mood, j.EnergyLevel, j.Pinned, j.WordCount, j.PublishedDate, j.UpdatedAt, j.ID, j.UserID)
 		} else {
-			result, err = tx.ExecContext(ctx, `INSERT INTO journals (id,user_id,title,content,tags,mood,published_date,search_vector,created_at,updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,to_tsvector('english',''),$8,$8)`, j.ID, j.UserID, j.Title, j.Content, tags, j.Mood, j.PublishedDate, j.CreatedAt)
+			result, err = tx.ExecContext(ctx,
+				`INSERT INTO journals (id,user_id,title,content,tags,mood,energy_level,pinned,word_count,published_date,search_vector,created_at,updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,to_tsvector('english',$3||' '||$4),$11,$11)`,
+				j.ID, j.UserID, j.Title, j.Content, tags, j.Mood, j.EnergyLevel, j.Pinned, j.WordCount, j.PublishedDate, j.CreatedAt)
 		}
 		if err != nil {
 			return fmt.Errorf("write journal: %w", err)
@@ -206,5 +216,26 @@ func journalFromRow(row journalRow) (domain.Journal, error) {
 	if err := json.Unmarshal(row.Tags, &tags); err != nil {
 		return domain.Journal{}, fmt.Errorf("unmarshal journal tags: %w", err)
 	}
-	return domain.Journal{ID: row.ID, UserID: row.UserID, Title: row.Title, Content: row.Content, Tags: tags, Mood: row.Mood, PublishedDate: row.PublishedDate, CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt}, nil
+	return domain.Journal{
+		ID: row.ID, UserID: row.UserID, Title: row.Title, Content: row.Content,
+		Tags: tags, Mood: row.Mood, EnergyLevel: row.EnergyLevel, Pinned: row.Pinned,
+		WordCount: row.WordCount, PublishedDate: row.PublishedDate,
+		CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt,
+	}, nil
 }
+
+// Search performs PostgreSQL full-text search using the search_vector GIN index.
+// Results are ordered by ts_rank descending.
+func (r *JournalRepository) Search(ctx context.Context, userID uuid.UUID, query string) ([]domain.Journal, error) {
+	var rows []journalRow
+	const ftsQuery = `SELECT ` + journalColumns + ` FROM journals
+		WHERE user_id = $1 AND search_vector @@ plainto_tsquery('english', $2)
+		ORDER BY ts_rank(search_vector, plainto_tsquery('english', $2)) DESC
+		LIMIT 50`
+	if err := r.db.SelectContext(ctx, &rows, ftsQuery, userID, query); err != nil {
+		return nil, fmt.Errorf("search journals: %w", err)
+	}
+	return journalsFromRows(rows)
+}
+
+var _ ports.JournalRepository = (*JournalRepository)(nil)

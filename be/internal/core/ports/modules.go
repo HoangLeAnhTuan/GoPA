@@ -13,6 +13,7 @@ type TaskRepository interface {
 	Create(context.Context, domain.Task) (domain.Task, error)
 	Get(context.Context, uuid.UUID, uuid.UUID) (domain.Task, error)
 	Update(context.Context, domain.Task) (domain.Task, error)
+	UpdateStatus(ctx context.Context, userID, id uuid.UUID, status domain.TaskStatus, targetPosition *int64) (domain.Task, error)
 	Delete(context.Context, uuid.UUID, uuid.UUID) error
 	NextPosition(context.Context, uuid.UUID, domain.TaskStatus) (int64, error)
 }
@@ -22,31 +23,18 @@ type VocabularyRepository interface {
 	ListDue(context.Context, uuid.UUID, int, time.Time) ([]domain.Vocabulary, error)
 	Get(context.Context, uuid.UUID, uuid.UUID) (domain.Vocabulary, error)
 	Create(context.Context, domain.Vocabulary) (domain.Vocabulary, error)
+	BulkCreate(context.Context, uuid.UUID, []domain.Vocabulary) ([]domain.Vocabulary, error)
 	Update(context.Context, domain.Vocabulary) (domain.Vocabulary, error)
 	Delete(context.Context, uuid.UUID, uuid.UUID) error
-	RecordReview(context.Context, uuid.UUID, uuid.UUID, int16, time.Time, domain.ReviewSchedule) error
-}
-
-type VehicleRepository interface {
-	List(context.Context, uuid.UUID) ([]domain.Vehicle, error)
-	Get(context.Context, uuid.UUID, uuid.UUID) (domain.Vehicle, error)
-	Create(context.Context, domain.Vehicle) (domain.Vehicle, error)
-	Update(context.Context, domain.Vehicle) (domain.Vehicle, error)
-	ListLogs(context.Context, uuid.UUID, uuid.UUID) ([]domain.VehicleLog, error)
-	CreateLog(context.Context, domain.VehicleLog) (domain.VehicleLog, error)
-	LatestMaintenanceMileage(context.Context, uuid.UUID, uuid.UUID) (*int, error)
-}
-
-type NetworkRepository interface {
-	List(context.Context, uuid.UUID) ([]domain.NetworkNode, error)
-	Get(context.Context, uuid.UUID, uuid.UUID) (domain.NetworkNode, error)
-	Create(context.Context, domain.NetworkNode) (domain.NetworkNode, error)
-	Update(context.Context, domain.NetworkNode) (domain.NetworkNode, error)
-	Delete(context.Context, uuid.UUID, uuid.UUID) error
+	RecordReview(context.Context, domain.VocabularyReview, domain.Vocabulary) error
+	CreateLearningSession(context.Context, domain.LearningSession) (domain.LearningSession, error)
+	UpdateLearningSession(context.Context, domain.LearningSession) (domain.LearningSession, error)
+	GetStats(context.Context, uuid.UUID) (domain.VocabularyStats, error)
 }
 
 type JournalRepository interface {
 	List(context.Context, uuid.UUID, domain.JournalFilter) ([]domain.Journal, error)
+	Search(ctx context.Context, userID uuid.UUID, query string) ([]domain.Journal, error)
 	Get(context.Context, uuid.UUID, uuid.UUID) (domain.Journal, error)
 	Create(context.Context, domain.Journal) (domain.Journal, error)
 	Update(context.Context, domain.Journal) (domain.Journal, error)
@@ -64,4 +52,5 @@ type PomodoroStore interface {
 
 type PomodoroHistoryRepository interface {
 	Create(context.Context, domain.PomodoroHistory) error
+	List(ctx context.Context, userID uuid.UUID, limit int, cursor string) ([]domain.PomodoroHistory, error)
 }

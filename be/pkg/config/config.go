@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"gopa/pkg/constants"
+
 	"github.com/joho/godotenv"
 )
-
-const exampleJWTSecret = "replace-with-a-long-random-secret"
 
 type Config struct {
 	AppEnv          string
@@ -60,7 +60,7 @@ func Load() (Config, error) {
 		LogLevel:        strings.ToLower(required("LOG_LEVEL")),
 		WebOrigin:       required("WEB_ORIGIN"),
 		ShutdownTimeout: shutdownTimeout,
-		BcryptCost:      optionalInt("BCRYPT_COST", 12),
+		BcryptCost:      optionalInt("BCRYPT_COST", constants.DefaultBcryptCost),
 	}
 
 	if err := cfg.Validate(); err != nil {
@@ -70,7 +70,7 @@ func Load() (Config, error) {
 }
 
 func (c Config) Validate() error {
-	if c.AppEnv != "development" && c.AppEnv != "test" && c.AppEnv != "production" {
+	if c.AppEnv != constants.Development && c.AppEnv != constants.Test && c.AppEnv != constants.Production {
 		return fmt.Errorf("APP_ENV must be development, test, or production")
 	}
 	if c.AccessTokenTTL <= 0 || c.RefreshTokenTTL <= 0 || c.ShutdownTimeout <= 0 {
@@ -85,8 +85,8 @@ func (c Config) Validate() error {
 	if _, err := url.ParseRequestURI(c.RabbitMQURL); err != nil {
 		return fmt.Errorf("RABBITMQ_URL must be a valid URL")
 	}
-	if c.AppEnv == "production" {
-		if c.JWTAccessSecret == exampleJWTSecret || len(c.JWTAccessSecret) < 32 {
+	if c.AppEnv == constants.Production {
+		if c.JWTAccessSecret == constants.ExampleJWTSecret || len(c.JWTAccessSecret) < 32 {
 			return fmt.Errorf("JWT_ACCESS_SECRET must be a non-example value with at least 32 characters in production")
 		}
 		if c.WebOrigin == "*" {

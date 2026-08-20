@@ -38,4 +38,24 @@ type FinanceRepository interface {
 	Cashflow(context.Context, uuid.UUID, time.Time, time.Time) (domain.CashflowSummary, error)
 	SpendingByCategory(context.Context, uuid.UUID, time.Time, time.Time) ([]domain.CategorySpending, error)
 	NetWorth(context.Context, uuid.UUID) (decimal.Decimal, error)
+	SeedDefaultCategories(context.Context, uuid.UUID) error
+}
+
+type BudgetRepository interface {
+	ListBudgets(context.Context, uuid.UUID, bool) ([]domain.Budget, error)
+	GetBudget(context.Context, uuid.UUID, uuid.UUID) (domain.Budget, error)
+	CreateBudget(context.Context, domain.Budget) (domain.Budget, error)
+	UpdateBudget(context.Context, domain.Budget) (domain.Budget, error)
+	DeleteBudget(context.Context, uuid.UUID, uuid.UUID) error
+	GetBudgetStatus(context.Context, uuid.UUID, uuid.UUID) (domain.BudgetStatus, error)
+	ListActiveBudgetsForCategory(context.Context, uuid.UUID, uuid.UUID) ([]domain.Budget, error)
+}
+
+type SavingsGoalRepository interface {
+	ListSavingsGoals(context.Context, uuid.UUID) ([]domain.SavingsGoal, error)
+	GetSavingsGoal(context.Context, uuid.UUID, uuid.UUID) (domain.SavingsGoal, error)
+	CreateSavingsGoal(context.Context, domain.SavingsGoal) (domain.SavingsGoal, error)
+	UpdateSavingsGoal(context.Context, domain.SavingsGoal) (domain.SavingsGoal, error)
+	DeleteSavingsGoal(context.Context, uuid.UUID, uuid.UUID) error
+	UpdateGoalProgress(ctx context.Context, userID, id uuid.UUID, amount decimal.Decimal) (domain.SavingsGoal, error)
 }

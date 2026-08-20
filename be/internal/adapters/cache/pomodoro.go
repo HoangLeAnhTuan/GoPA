@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"time"
 
+	"gopa/internal/constants"
+	"gopa/internal/core/domain"
+
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	"gopa/internal/core/domain"
 )
 
 type PomodoroStore struct{ client *redis.Client }
@@ -45,4 +47,4 @@ func (s *PomodoroStore) Delete(ctx context.Context, userID uuid.UUID) error {
 	}
 	return nil
 }
-func pomodoroKey(userID uuid.UUID) string { return "pomodoro:state:" + userID.String() }
+func pomodoroKey(userID uuid.UUID) string { return constants.CachePomodoroStateKey + userID.String() }

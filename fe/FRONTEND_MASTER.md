@@ -302,6 +302,17 @@ fe/src/
 └── main.tsx
 ```
 
+### 4.1 Constant Architecture & Conventions
+
+GoPA Frontend organizes constants into two clear layers based on domain separation:
+
+1. **Non-Domain Constants (`fe/src/constants/constants.ts`)**:
+   - Contains general application environment strings (`PRODUCTION`, `DEVELOPMENT`, `DEBUG`, `TEST`), primitive utility defaults (`ONE_STRING`, `ZERO_STRING`, `ONE_INT32`, `ZERO_INT32`), API client timeouts (`DEFAULT_API_TIMEOUT`), and UI pagination defaults (`DEFAULT_PAGE_SIZE`).
+   - Imported by shared utilities, libraries, and application configs.
+2. **Domain Constants (`fe/src/domain/constants.ts`)**:
+   - Contains domain entity states and enums matching `be/internal/core/domain` (`USER_ROLE`, `TASK_STATUS`, `TASK_PRIORITY`, `TASK_CATEGORY`, `VOCABULARY_LANGUAGE`, `JOURNAL_MOOD`, `POMODORO_STATUS`, `ACCOUNT_TYPE`, `CATEGORY_TYPE`, `TRANSACTION_TYPE`).
+   - Standardized using `as const` object definitions to preserve strict TypeScript type safety across feature modules.
+
 ---
 
 ## 5. Technology and responsibility boundaries

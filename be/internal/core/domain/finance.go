@@ -117,6 +117,70 @@ func (t *Transaction) Validate() error {
 	return normalizeTags(&t.Tags)
 }
 
+type BudgetPeriod string
+
+const (
+	BudgetPeriodWeekly    BudgetPeriod = "WEEKLY"
+	BudgetPeriodMonthly   BudgetPeriod = "MONTHLY"
+	BudgetPeriodQuarterly BudgetPeriod = "QUARTERLY"
+	BudgetPeriodYearly    BudgetPeriod = "YEARLY"
+	BudgetPeriodCustom    BudgetPeriod = "CUSTOM"
+)
+
+type Budget struct {
+	ID             uuid.UUID       `json:"id" db:"id"`
+	UserID         uuid.UUID       `json:"user_id" db:"user_id"`
+	CategoryID     *uuid.UUID      `json:"category_id,omitempty" db:"category_id"`
+	Name           string          `json:"name" db:"name"`
+	Amount         decimal.Decimal `json:"amount" db:"amount"`
+	Period         BudgetPeriod    `json:"period" db:"period"`
+	StartDate      time.Time       `json:"start_date" db:"start_date"`
+	EndDate        time.Time       `json:"end_date" db:"end_date"`
+	AlertThreshold decimal.Decimal `json:"alert_threshold" db:"alert_threshold"`
+	IsActive       bool            `json:"is_active" db:"is_active"`
+	CreatedAt      time.Time       `json:"created_at" db:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at" db:"updated_at"`
+}
+
+func (b Budget) Validate() error {
+	if len(strings.TrimSpace(b.Name)) == 0 || len(b.Name) > 150 || !b.Amount.IsPositive() || !validBudgetPeriod(b.Period) || b.StartDate.IsZero() || b.EndDate.IsZero() || b.EndDate.Before(b.StartDate) || !b.AlertThreshold.IsPositive() || b.AlertThreshold.GreaterThan(decimal.NewFromInt(1)) {
+		return ErrValidation
+	}
+	return nil
+}
+
+func validBudgetPeriod(p BudgetPeriod) bool {
+	return p == BudgetPeriodWeekly || p == BudgetPeriodMonthly || p == BudgetPeriodQuarterly || p == BudgetPeriodYearly || p == BudgetPeriodCustom
+}
+
+type BudgetStatus struct {
+	Budget           Budget          `json:"budget"`
+	SpentAmount      decimal.Decimal `json:"spent_amount"`
+	UtilizationRate  decimal.Decimal `json:"utilization_rate"`
+	IsAlertTriggered bool            `json:"is_alert_triggered"`
+}
+
+type SavingsGoal struct {
+	ID              uuid.UUID       `json:"id" db:"id"`
+	UserID          uuid.UUID       `json:"user_id" db:"user_id"`
+	Name            string          `json:"name" db:"name"`
+	TargetAmount    decimal.Decimal `json:"target_amount" db:"target_amount"`
+	CurrentAmount   decimal.Decimal `json:"current_amount" db:"current_amount"`
+	LinkedAccountID *uuid.UUID      `json:"linked_account_id,omitempty" db:"linked_account_id"`
+	TargetDate      *time.Time      `json:"target_date,omitempty" db:"target_date"`
+	Color           string          `json:"color" db:"color"`
+	Icon            string          `json:"icon" db:"icon"`
+	CreatedAt       time.Time       `json:"created_at" db:"created_at"`
+	UpdatedAt       time.Time       `json:"updated_at" db:"updated_at"`
+}
+
+func (g SavingsGoal) Validate() error {
+	if len(strings.TrimSpace(g.Name)) == 0 || len(g.Name) > 150 || !g.TargetAmount.IsPositive() || g.CurrentAmount.IsNegative() || !validHexColor(g.Color) || len(strings.TrimSpace(g.Icon)) == 0 || len(g.Icon) > 50 {
+		return ErrValidation
+	}
+	return nil
+}
+
 type CashflowSummary struct {
 	Income      decimal.Decimal `json:"income"`
 	Expense     decimal.Decimal `json:"expense"`

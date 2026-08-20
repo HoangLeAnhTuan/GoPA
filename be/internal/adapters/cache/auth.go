@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"gopa/internal/constants"
+
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
@@ -53,12 +55,13 @@ func (s *RefreshSessionStore) Delete(ctx context.Context, userID, sessionID uuid
 }
 
 func (l *RateLimiter) Allow(ctx context.Context, key string, limit int, window time.Duration) (bool, error) {
-	count, err := l.client.Incr(ctx, "rate:"+key).Result()
+	redisKey := constants.CacheRateLimitPrefix + key
+	count, err := l.client.Incr(ctx, redisKey).Result()
 	if err != nil {
 		return false, fmt.Errorf("increment rate limit: %w", err)
 	}
 	if count == 1 {
-		if err := l.client.Expire(ctx, "rate:"+key, window).Err(); err != nil {
+		if err := l.client.Expire(ctx, redisKey, window).Err(); err != nil {
 			return false, fmt.Errorf("set rate limit expiry: %w", err)
 		}
 	}
@@ -66,5 +69,5 @@ func (l *RateLimiter) Allow(ctx context.Context, key string, limit int, window t
 }
 
 func refreshSessionKey(userID, sessionID uuid.UUID) string {
-	return "auth:refresh:" + userID.String() + ":" + sessionID.String()
+	return constants.CacheAuthRefreshPrefix + userID.String() + ":" + sessionID.String()
 }

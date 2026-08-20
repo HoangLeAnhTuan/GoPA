@@ -45,13 +45,41 @@ type TransactionInput struct {
 	IsRecurring  bool
 }
 
-type FinanceService struct {
-	repository ports.FinanceRepository
-	now        func() time.Time
+type BudgetInput struct {
+	CategoryID     *uuid.UUID
+	Name           string
+	Amount         decimal.Decimal
+	Period         domain.BudgetPeriod
+	StartDate      time.Time
+	EndDate        time.Time
+	AlertThreshold decimal.Decimal
+	IsActive       bool
 }
 
-func NewFinanceService(repository ports.FinanceRepository) *FinanceService {
-	return &FinanceService{repository: repository, now: time.Now}
+type SavingsGoalInput struct {
+	Name            string
+	TargetAmount    decimal.Decimal
+	CurrentAmount   decimal.Decimal
+	LinkedAccountID *uuid.UUID
+	TargetDate      *time.Time
+	Color           string
+	Icon            string
+}
+
+type FinanceService struct {
+	repository   ports.FinanceRepository
+	budgets      ports.BudgetRepository
+	savingsGoals ports.SavingsGoalRepository
+	now          func() time.Time
+}
+
+func NewFinanceService(repository ports.FinanceRepository, budgets ports.BudgetRepository, savingsGoals ports.SavingsGoalRepository) *FinanceService {
+	return &FinanceService{
+		repository:   repository,
+		budgets:      budgets,
+		savingsGoals: savingsGoals,
+		now:          time.Now,
+	}
 }
 
 func (s *FinanceService) ListAccounts(ctx context.Context, userID uuid.UUID, includeArchived bool) ([]domain.Account, error) {
@@ -204,6 +232,147 @@ func (s *FinanceService) SpendingByCategory(ctx context.Context, userID uuid.UUI
 
 func (s *FinanceService) NetWorth(ctx context.Context, userID uuid.UUID) (decimal.Decimal, error) {
 	return s.repository.NetWorth(ctx, userID)
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Budgets
+// ─────────────────────────────────────────────────────────────────
+
+func (s *FinanceService) ListBudgets(ctx context.Context, userID uuid.UUID, activeOnly bool) ([]domain.Budget, error) {
+	return s.budgets.ListBudgets(ctx, userID, activeOnly)
+}
+
+func (s *FinanceService) GetBudget(ctx context.Context, userID, id uuid.UUID) (domain.Budget, error) {
+	return s.budgets.GetBudget(ctx, userID, id)
+}
+
+func (s *FinanceService) CreateBudget(ctx context.Context, userID uuid.UUID, input BudgetInput) (domain.Budget, error) {
+	now := s.now().UTC()
+	threshold := input.AlertThreshold
+	if !threshold.IsPositive() {
+		threshold = decimal.NewFromFloat(0.80)
+	}
+	budget := domain.Budget{
+		ID:             uuid.New(),
+		UserID:         userID,
+		CategoryID:     input.CategoryID,
+		Name:           strings.TrimSpace(input.Name),
+		Amount:         input.Amount,
+		Period:         input.Period,
+		StartDate:      input.StartDate.UTC(),
+		EndDate:        input.EndDate.UTC(),
+		AlertThreshold: threshold,
+		IsActive:       input.IsActive,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+	}
+	if err := budget.Validate(); err != nil {
+		return domain.Budget{}, err
+	}
+	return s.budgets.CreateBudget(ctx, budget)
+}
+
+func (s *FinanceService) UpdateBudget(ctx context.Context, userID, id uuid.UUID, input BudgetInput) (domain.Budget, error) {
+	budget, err := s.budgets.GetBudget(ctx, userID, id)
+	if err != nil {
+		return domain.Budget{}, err
+	}
+	threshold := input.AlertThreshold
+	if !threshold.IsPositive() {
+		threshold = decimal.NewFromFloat(0.80)
+	}
+	budget.CategoryID = input.CategoryID
+	budget.Name = strings.TrimSpace(input.Name)
+	budget.Amount = input.Amount
+	budget.Period = input.Period
+	budget.StartDate = input.StartDate.UTC()
+	budget.EndDate = input.EndDate.UTC()
+	budget.AlertThreshold = threshold
+	budget.IsActive = input.IsActive
+	budget.UpdatedAt = s.now().UTC()
+	if err := budget.Validate(); err != nil {
+		return domain.Budget{}, err
+	}
+	return s.budgets.UpdateBudget(ctx, budget)
+}
+
+func (s *FinanceService) DeleteBudget(ctx context.Context, userID, id uuid.UUID) error {
+	return s.budgets.DeleteBudget(ctx, userID, id)
+}
+
+func (s *FinanceService) GetBudgetStatus(ctx context.Context, userID, id uuid.UUID) (domain.BudgetStatus, error) {
+	return s.budgets.GetBudgetStatus(ctx, userID, id)
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Savings Goals
+// ─────────────────────────────────────────────────────────────────
+
+func (s *FinanceService) ListSavingsGoals(ctx context.Context, userID uuid.UUID) ([]domain.SavingsGoal, error) {
+	return s.savingsGoals.ListSavingsGoals(ctx, userID)
+}
+
+func (s *FinanceService) GetSavingsGoal(ctx context.Context, userID, id uuid.UUID) (domain.SavingsGoal, error) {
+	return s.savingsGoals.GetSavingsGoal(ctx, userID, id)
+}
+
+func (s *FinanceService) CreateSavingsGoal(ctx context.Context, userID uuid.UUID, input SavingsGoalInput) (domain.SavingsGoal, error) {
+	now := s.now().UTC()
+	goal := domain.SavingsGoal{
+		ID:              uuid.New(),
+		UserID:          userID,
+		Name:            strings.TrimSpace(input.Name),
+		TargetAmount:    input.TargetAmount,
+		CurrentAmount:   input.CurrentAmount,
+		LinkedAccountID: input.LinkedAccountID,
+		TargetDate:      input.TargetDate,
+		Color:           defaultString(input.Color, "#10B981"),
+		Icon:            defaultString(input.Icon, "target"),
+		CreatedAt:       now,
+		UpdatedAt:       now,
+	}
+	if err := goal.Validate(); err != nil {
+		return domain.SavingsGoal{}, err
+	}
+	return s.savingsGoals.CreateSavingsGoal(ctx, goal)
+}
+
+func (s *FinanceService) UpdateSavingsGoal(ctx context.Context, userID, id uuid.UUID, input SavingsGoalInput) (domain.SavingsGoal, error) {
+	goal, err := s.savingsGoals.GetSavingsGoal(ctx, userID, id)
+	if err != nil {
+		return domain.SavingsGoal{}, err
+	}
+	goal.Name = strings.TrimSpace(input.Name)
+	goal.TargetAmount = input.TargetAmount
+	goal.CurrentAmount = input.CurrentAmount
+	goal.LinkedAccountID = input.LinkedAccountID
+	goal.TargetDate = input.TargetDate
+	goal.Color = defaultString(input.Color, "#10B981")
+	goal.Icon = defaultString(input.Icon, "target")
+	goal.UpdatedAt = s.now().UTC()
+	if err := goal.Validate(); err != nil {
+		return domain.SavingsGoal{}, err
+	}
+	return s.savingsGoals.UpdateSavingsGoal(ctx, goal)
+}
+
+func (s *FinanceService) DeleteSavingsGoal(ctx context.Context, userID, id uuid.UUID) error {
+	return s.savingsGoals.DeleteSavingsGoal(ctx, userID, id)
+}
+
+func (s *FinanceService) UpdateGoalProgress(ctx context.Context, userID, id uuid.UUID, amount decimal.Decimal) (domain.SavingsGoal, error) {
+	if amount.IsZero() {
+		return domain.SavingsGoal{}, domain.ErrValidation
+	}
+	return s.savingsGoals.UpdateGoalProgress(ctx, userID, id, amount)
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Auto-Seeding
+// ─────────────────────────────────────────────────────────────────
+
+func (s *FinanceService) SeedDefaultCategories(ctx context.Context, userID uuid.UUID) error {
+	return s.repository.SeedDefaultCategories(ctx, userID)
 }
 
 func defaultString(value, fallback string) string {

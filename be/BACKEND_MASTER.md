@@ -142,6 +142,20 @@ Do **not** create a `BaseRepository[T]`, a universal generic CRUD service, or an
 1. A core use case depends on a replaceable external capability (repo, cache, broker, AI client), OR
 2. A clear test seam is needed for isolated unit testing.
 
+### 3.3 Constant Architecture & Conventions
+
+GoPA Backend organizes constants into three clear layers based on visibility and scope:
+
+1. **Public / Global Non-Domain Constants (`be/pkg/constants/constants.go`)**:
+   - Contains application environment modes (`Production`, `Development`, `Test`, `Debug`), primitive utility defaults (`ONE_STRING`, `ZERO_STRING`, `ONE_INT32`, `ZERO_INT32`), HTTP headers, cookie names (`RefreshCookieName`), and public configuration default constants (`DefaultBcryptCost`, `DefaultPageSize`).
+   - Accessible by all packages across the backend repository.
+2. **Domain Business Constants (`be/internal/core/domain/`)**:
+   - Contains domain entity types and enums (`TaskStatus`, `TaskPriority`, `UserRole`, `JournalMood`, `TransactionType`, `AccountType`).
+   - Pure business domain types live alongside domain entities in `user.go`, `models.go`, `finance.go`.
+3. **Internal Non-Domain Constants (`be/internal/constants/constants.go`)**:
+   - Contains unexported/internal infrastructure constants (internal cache key prefixes, internal queue/exchange names, internal context keys).
+   - Enforces Go package encapsulation so external modules cannot import internal implementation details.
+
 ---
 
 ## 4. Technology decisions

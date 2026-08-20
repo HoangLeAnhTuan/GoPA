@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -60,4 +61,8 @@ func (s *PomodoroService) Stop(ctx context.Context, userID uuid.UUID) error {
 	}
 	history := domain.PomodoroHistory{ID: uuid.New(), EventID: uuid.New(), UserID: userID, TaskID: state.TaskID, StartedAt: state.StartedAt, EndedAt: endedAt, DurationSeconds: elapsed, CreatedAt: endedAt}
 	return s.history.Create(ctx, history)
+}
+
+func (s *PomodoroService) ListHistory(ctx context.Context, userID uuid.UUID, limit int, cursor string) ([]domain.PomodoroHistory, error) {
+	return s.history.List(ctx, userID, boundedLimit(limit), strings.TrimSpace(cursor))
 }

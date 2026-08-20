@@ -37,7 +37,9 @@ func TestTransactionValidate_NormalizesTags(t *testing.T) {
 
 func TestTransactionValidate_AllowsNoTags(t *testing.T) {
 	transaction := Transaction{AccountID: uuid.New(), Type: TransactionIncome, Amount: decimal.NewFromInt(100), Currency: "VND", ExchangeRate: decimal.NewFromInt(1), OccurredAt: time.Now()}
-	if err := transaction.Validate(); err != nil { t.Fatalf("a transaction without tags must be valid: %v", err) }
+	if err := transaction.Validate(); err != nil {
+		t.Fatalf("a transaction without tags must be valid: %v", err)
+	}
 }
 
 func TestAccountValidate_AllowsNegativeCurrentBalanceForCreditDebt(t *testing.T) {

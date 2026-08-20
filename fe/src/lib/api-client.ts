@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import { DEFAULT_API_TIMEOUT } from "../constants/constants";
 
 export interface ApiError {
   code: string;
@@ -15,7 +16,7 @@ interface ErrorEnvelope {
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api/v1",
-  timeout: 10_000,
+  timeout: DEFAULT_API_TIMEOUT,
   withCredentials: true,
 });
 
