@@ -1,7 +1,8 @@
-import { ChevronLeft, Languages, LayoutDashboard, ListTodo, Menu, NotebookPen, Settings, Timer, WalletCards, X } from "lucide-react";
+import { ChevronLeft, Languages, LayoutDashboard, ListTodo, Menu, NotebookPen, Search, Settings, Timer, WalletCards, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { CommandPalette } from "../components/design-system/command-palette";
 import { LanguageSwitcher } from "../components/design-system/language-switcher";
 import { PomodoroWidget } from "../components/design-system/pomodoro-widget";
 import { ThemeSwitcher } from "../components/design-system/theme-switcher";
@@ -74,12 +75,19 @@ export function AppLayout() {
   const collapsed = useUIPreferencesStore((state) => state.sidebarCollapsed);
   const toggleSidebar = useUIPreferencesStore((state) => state.toggleSidebar);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
   useEffect(() => setMobileOpen(false), [location.pathname]);
   useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => event.key === "Escape" && setMobileOpen(false);
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   return (
@@ -101,6 +109,18 @@ export function AppLayout() {
           <div className="flex min-w-0 items-center gap-3">
             <button aria-expanded={mobileOpen} aria-label={t("controls.openNavigation")} className="icon-button sm:hidden" onClick={() => setMobileOpen(true)} type="button"><Menu aria-hidden="true" size={19} /></button>
             <p className="truncate text-sm font-bold tracking-tight">GoPA</p>
+            <button
+              aria-label={t("controls.searchAria")}
+              className="ml-2 flex items-center gap-2 rounded-xl border border-white/40 bg-white/50 px-2.5 py-1 text-xs text-muted-foreground transition hover:bg-white/80 hover:text-foreground dark:border-white/10 dark:bg-slate-900/60"
+              onClick={() => setCommandPaletteOpen(true)}
+              type="button"
+            >
+              <Search size={13} />
+              <span className="hidden sm:inline">{t("controls.search")}</span>
+              <kbd className="rounded border border-white/20 bg-white/40 px-1 py-0.2 font-mono text-[10px] dark:bg-white/10">
+                Ctrl K
+              </kbd>
+            </button>
           </div>
           <div className="flex shrink-0 items-center gap-1 sm:gap-3"><LanguageSwitcher /><ThemeSwitcher /></div>
         </header>
@@ -111,6 +131,7 @@ export function AppLayout() {
         </main>
       </div>
       <PomodoroWidget />
+      <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
     </div>
   );
 }

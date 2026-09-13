@@ -7,6 +7,14 @@
   "editTitle": "Edit Journal Entry",
   "newTitle": "New Journal Entry",
   "presetTagNotice": "Quick tag selector",
+  "presetTags": {
+    "journal": "journal",
+    "schedule": "schedule",
+    "ideas": "ideas",
+    "study": "study",
+    "work": "work",
+    "goals": "goals"
+  },
   "confirm": "Confirm",
   "cancel": "Cancel",
   "chars": "chars",
@@ -54,9 +62,28 @@
   "form": {
     "title": "Entry Title",
     "tags": "Tags (e.g. architecture, refactor, study)",
-    "content": "Compose your Markdown notes here..."
+    "content": "Compose your Markdown notes here...",
+    "titleRequired": "Please enter an entry title",
+    "saveSuccess": "Journal entry saved successfully",
+    "saveFailed": "Failed to save journal entry. Please try again."
   },
   "save": "Save Entry",
   "delete": "Delete Entry",
-  "confirmDelete": "Delete this journal entry permanently?"
+  "confirmDelete": "Delete this journal entry permanently?",
+  "detail": {
+    "pinned": "Pinned",
+    "unpin": "Unpin",
+    "pin": "Pin",
+    "exportMd": "Export .md",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete \"{{title}}\"?",
+    "moodLabel": "Mood: {{mood}}",
+    "energyLabel": "Energy: {{level}}/5",
+    "backlinksTitle": "Connected Knowledge & Backlinks",
+    "linkNote": "+ Link Note",
+    "selectEntry": "Select an entry to connect...",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "backlinksDesc": "Connect thoughts and notes to build an organic neural web of personal knowledge."
+  }
 }

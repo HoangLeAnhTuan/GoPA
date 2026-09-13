@@ -15,6 +15,8 @@ type JournalInput struct {
 	Content       string
 	Tags          []string
 	Mood          *domain.JournalMood
+	EnergyLevel   *int16
+	Pinned        *bool
 	PublishedDate *time.Time
 }
 
@@ -46,7 +48,25 @@ func (s *JournalService) Create(ctx context.Context, userID uuid.UUID, input Jou
 	if input.PublishedDate != nil {
 		publishedDate = input.PublishedDate.UTC()
 	}
-	journal := domain.Journal{ID: uuid.New(), UserID: userID, Title: strings.TrimSpace(input.Title), Content: input.Content, Tags: append([]string(nil), input.Tags...), Mood: input.Mood, PublishedDate: publishedDate, CreatedAt: now, UpdatedAt: now}
+	pinned := false
+	if input.Pinned != nil {
+		pinned = *input.Pinned
+	}
+	words := len(strings.Fields(input.Content))
+	journal := domain.Journal{
+		ID:            uuid.New(),
+		UserID:        userID,
+		Title:         strings.TrimSpace(input.Title),
+		Content:       input.Content,
+		Tags:          append([]string(nil), input.Tags...),
+		Mood:          input.Mood,
+		EnergyLevel:   input.EnergyLevel,
+		Pinned:        pinned,
+		WordCount:     words,
+		PublishedDate: publishedDate,
+		CreatedAt:     now,
+		UpdatedAt:     now,
+	}
 	if err := journal.Validate(); err != nil {
 		return domain.Journal{}, err
 	}
@@ -59,6 +79,13 @@ func (s *JournalService) Update(ctx context.Context, userID, id uuid.UUID, input
 		return domain.Journal{}, err
 	}
 	journal.Title, journal.Content, journal.Tags, journal.Mood = strings.TrimSpace(input.Title), input.Content, append([]string(nil), input.Tags...), input.Mood
+	if input.EnergyLevel != nil {
+		journal.EnergyLevel = input.EnergyLevel
+	}
+	if input.Pinned != nil {
+		journal.Pinned = *input.Pinned
+	}
+	journal.WordCount = len(strings.Fields(input.Content))
 	if input.PublishedDate != nil {
 		journal.PublishedDate = input.PublishedDate.UTC()
 	}

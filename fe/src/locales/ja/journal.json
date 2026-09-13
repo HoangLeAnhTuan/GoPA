@@ -7,7 +7,15 @@
   "editTitle": "ジャーナル編集",
   "newTitle": "新規ジャーナル作成",
   "presetTagNotice": "クイックタグ選択",
-  "confirm": "確認",
+  "presetTags": {
+    "journal": "日記",
+    "schedule": "スケジュール",
+    "ideas": "アイデア",
+    "study": "勉強",
+    "work": "仕事",
+    "goals": "目標"
+  },
+  "confirm": "確定",
   "cancel": "キャンセル",
   "chars": "文字",
   "search": "タイトルや内容で検索...",
@@ -53,10 +61,29 @@
   },
   "form": {
     "title": "エントリータイトル",
-    "tags": "タグ（例：設計、リファクタリング、学習）",
-    "content": "ここに Markdown メモを入力..."
+    "tags": "タグ (例: アーキテクチャ, リファクタ, 勉強)",
+    "content": "Markdown形式でノートを記述...",
+    "titleRequired": "記事のタイトルを入力してください",
+    "saveSuccess": "ジャーナルを正常に保存しました",
+    "saveFailed": "ジャーナルの保存に失敗しました。もう一度お試しください。"
   },
   "save": "エントリーを保存",
   "delete": "エントリーを削除",
-  "confirmDelete": "このジャーナル項目を完全に削除しますか？"
+  "confirmDelete": "このジャーナル項目を完全に削除しますか？",
+  "detail": {
+    "pinned": "ピン留め済み",
+    "unpin": "ピン留め解除",
+    "pin": "ピン留め",
+    "exportMd": ".md をエクスポート",
+    "delete": "削除",
+    "confirmDelete": "「{{title}}」を削除してもよろしいですか？",
+    "moodLabel": "気分: {{mood}}",
+    "energyLabel": "エネルギー: {{level}}/5",
+    "backlinksTitle": "関連ナレッジ ＆ バックリンク",
+    "linkNote": "+ ノートをリンク",
+    "selectEntry": "接続するエントリーを選択...",
+    "confirm": "確定",
+    "cancel": "キャンセル",
+    "backlinksDesc": "思考とノートを結びつけ、有機的な知識ネットワークを構築します。"
+  }
 }

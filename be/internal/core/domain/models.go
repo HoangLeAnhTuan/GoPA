@@ -336,14 +336,14 @@ func (s PomodoroState) Validate() error {
 }
 
 type PomodoroHistory struct {
-	ID              uuid.UUID  `db:"id"`
-	EventID         uuid.UUID  `db:"event_id"`
-	UserID          uuid.UUID  `db:"user_id"`
-	TaskID          *uuid.UUID `db:"task_id"`
-	StartedAt       time.Time  `db:"started_at"`
-	EndedAt         time.Time  `db:"ended_at"`
-	DurationSeconds int        `db:"duration_seconds"`
-	CreatedAt       time.Time  `db:"created_at"`
+	ID              uuid.UUID  `json:"id" db:"id"`
+	EventID         uuid.UUID  `json:"event_id" db:"event_id"`
+	UserID          uuid.UUID  `json:"user_id" db:"user_id"`
+	TaskID          *uuid.UUID `json:"task_id,omitempty" db:"task_id"`
+	StartedAt       time.Time  `json:"started_at" db:"started_at"`
+	EndedAt         time.Time  `json:"ended_at" db:"ended_at"`
+	DurationSeconds int        `json:"duration_seconds" db:"duration_seconds"`
+	CreatedAt       time.Time  `json:"created_at" db:"created_at"`
 }
 
 func (j *Journal) Validate() error {

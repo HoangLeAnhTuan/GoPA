@@ -1,7 +1,10 @@
 package http
 
 import (
+	"errors"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -42,3 +45,36 @@ func queryLimit(c *gin.Context, defaultLimit int) int {
 	}
 	return val
 }
+
+// FlexibleDate provides custom JSON unmarshaling that accepts both HTML date input format
+// ("2006-01-02") and standard ISO/RFC3339 timestamps ("2006-01-02T15:04:05Z07:00").
+type FlexibleDate time.Time
+
+func (fd *FlexibleDate) UnmarshalJSON(b []byte) error {
+	s := strings.Trim(string(b), "\"")
+	if s == "" || s == "null" {
+		return nil
+	}
+	layouts := []string{
+		"2006-01-02",
+		time.RFC3339,
+		time.RFC3339Nano,
+		"2006-01-02 15:04:05",
+	}
+	for _, layout := range layouts {
+		if t, err := time.Parse(layout, s); err == nil {
+			*fd = FlexibleDate(t.UTC())
+			return nil
+		}
+	}
+	return errors.New("invalid date format: expected YYYY-MM-DD or RFC3339")
+}
+
+func (fd *FlexibleDate) Time() *time.Time {
+	if fd == nil {
+		return nil
+	}
+	t := time.Time(*fd)
+	return &t
+}
+

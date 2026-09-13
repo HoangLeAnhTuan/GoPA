@@ -1,8 +1,6 @@
 package http
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"gopa/internal/core/domain"
 	"gopa/internal/services"
@@ -55,7 +53,7 @@ type createTaskRequest struct {
 	Status             domain.TaskStatus   `json:"status"`
 	Priority           domain.TaskPriority `json:"priority"`
 	Category           domain.TaskCategory `json:"category"`
-	DueDate            *time.Time          `json:"due_date"`
+	DueDate            *FlexibleDate       `json:"due_date"`
 	EstimatedPomodoros int                 `json:"estimated_pomodoros"`
 }
 
@@ -70,7 +68,7 @@ func (h *TasksHandler) create(c *gin.Context) {
 		Status:             req.Status,
 		Priority:           req.Priority,
 		Category:           req.Category,
-		DueDate:            req.DueDate,
+		DueDate:            req.DueDate.Time(),
 		EstimatedPomodoros: req.EstimatedPomodoros,
 	})
 	if err != nil {
@@ -86,7 +84,7 @@ type updateTaskRequest struct {
 	Status             domain.TaskStatus   `json:"status"`
 	Priority           domain.TaskPriority `json:"priority"`
 	Category           domain.TaskCategory `json:"category"`
-	DueDate            *time.Time          `json:"due_date"`
+	DueDate            *FlexibleDate       `json:"due_date"`
 	Position           *int64              `json:"position"`
 	EstimatedPomodoros *int                `json:"estimated_pomodoros"`
 	CompletedPomodoros *int                `json:"completed_pomodoros"`
@@ -107,7 +105,7 @@ func (h *TasksHandler) update(c *gin.Context) {
 		Status:             req.Status,
 		Priority:           req.Priority,
 		Category:           req.Category,
-		DueDate:            req.DueDate,
+		DueDate:            req.DueDate.Time(),
 		Position:           req.Position,
 		EstimatedPomodoros: req.EstimatedPomodoros,
 		CompletedPomodoros: req.CompletedPomodoros,

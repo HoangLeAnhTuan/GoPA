@@ -18,17 +18,32 @@ export const TASK_PRIORITY = {
   LOW: "LOW",
   MEDIUM: "MEDIUM",
   HIGH: "HIGH",
+  URGENT: "URGENT",
 } as const;
 
 export const TASK_CATEGORY = {
   WORK: "WORK",
   STUDY: "STUDY",
   LIFE: "LIFE",
+  LEETCODE: "LEETCODE",
 } as const;
 
 export const VOCABULARY_LANGUAGE = {
   JP: "JP",
   EN: "EN",
+} as const;
+
+export const STUDY_MODE = {
+  FLASHCARD: "FLASHCARD",
+  MULTIPLE_CHOICE: "MULTIPLE_CHOICE",
+  TYPE_IN: "TYPE_IN",
+  AUDIO_QUIZ: "AUDIO_QUIZ",
+} as const;
+
+export const LEARNING_SESSION_TYPE = {
+  REVIEW: "REVIEW",
+  QUIZ: "QUIZ",
+  SPEED: "SPEED",
 } as const;
 
 export const JOURNAL_MOOD = {
@@ -62,4 +77,10 @@ export const TRANSACTION_TYPE = {
   INCOME: "INCOME",
   EXPENSE: "EXPENSE",
   TRANSFER: "TRANSFER",
+} as const;
+
+export const BUDGET_PERIOD = {
+  MONTHLY: "MONTHLY",
+  QUARTERLY: "QUARTERLY",
+  YEARLY: "YEARLY",
 } as const;

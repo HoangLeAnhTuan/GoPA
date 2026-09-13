@@ -228,6 +228,7 @@ func setupTestServer() (*gin.Engine, *utils.TokenManager, domain.User) {
 		nil,
 		nil,
 		pomoHandler,
+		nil,
 		tokenMgr,
 		rateLimiterStub{},
 	)
@@ -372,3 +373,40 @@ func TestAuthHandler_UpdateProfile(t *testing.T) {
 		t.Fatalf("expected display name 'Antigravity Pro', got %v", dataMap["display_name"])
 	}
 }
+
+func TestFlexibleDate_UnmarshalJSON(t *testing.T) {
+	type testPayload struct {
+		Date *FlexibleDate `json:"date"`
+	}
+
+	// 1. HTML standard date input format (YYYY-MM-DD)
+	input1 := []byte(`{"date":"2026-09-13"}`)
+	var p1 testPayload
+	if err := json.Unmarshal(input1, &p1); err != nil {
+		t.Fatalf("failed to unmarshal YYYY-MM-DD date: %v", err)
+	}
+	if p1.Date == nil || p1.Date.Time().Year() != 2026 || p1.Date.Time().Month() != 9 || p1.Date.Time().Day() != 13 {
+		t.Fatalf("unexpected date parsed: %v", p1.Date)
+	}
+
+	// 2. ISO/RFC3339 format
+	input2 := []byte(`{"date":"2026-09-13T12:00:00Z"}`)
+	var p2 testPayload
+	if err := json.Unmarshal(input2, &p2); err != nil {
+		t.Fatalf("failed to unmarshal RFC3339 date: %v", err)
+	}
+	if p2.Date == nil || p2.Date.Time().Hour() != 12 {
+		t.Fatalf("unexpected hour parsed: %v", p2.Date)
+	}
+
+	// 3. Null date
+	input3 := []byte(`{"date":null}`)
+	var p3 testPayload
+	if err := json.Unmarshal(input3, &p3); err != nil {
+		t.Fatalf("failed to unmarshal null date: %v", err)
+	}
+	if p3.Date.Time() != nil {
+		t.Fatalf("expected nil for null date, got %v", p3.Date)
+	}
+}
+

@@ -1,6 +1,6 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { apiClient, toApiError } from "../../../lib/api-client";
-import type { AuthDto, AuthResult, LoginInput, RegisterInput, User, UserDto } from "../types";
+import type { AuthDto, AuthResult, LoginInput, RegisterInput, UpdateProfileInput, User, UserDto } from "../types";
 
 interface Envelope<T> {
   data: T;
@@ -49,6 +49,7 @@ export async function register(input: RegisterInput): Promise<User> {
     email: input.email,
     password: input.password,
     confirm_password: input.confirmPassword,
+    display_name: input.displayName ?? "",
   });
   return toUser(response.data.data);
 }
@@ -67,6 +68,11 @@ export async function restoreSession(): Promise<User> {
   return toUser(response.data.data);
 }
 
+export async function updateProfile(input: UpdateProfileInput): Promise<User> {
+  const response = await apiClient.patch<Envelope<UserDto>>("/me", input);
+  return toUser(response.data.data);
+}
+
 export async function logout(): Promise<void> {
   try {
     await refreshClient.post("/auth/logout");
@@ -78,6 +84,10 @@ export async function logout(): Promise<void> {
   } finally {
     clearAccessToken();
   }
+}
+
+export function getAccessToken(): string | null {
+  return accessToken;
 }
 
 export function clearAccessToken() {
@@ -102,7 +112,14 @@ function applyAuthResult(dto: AuthDto): AuthResult {
 }
 
 function toUser(dto: UserDto): User {
-  return { id: dto.id, email: dto.email, role: dto.role, createdAt: new Date(dto.created_at) };
+  return {
+    id: dto.id,
+    email: dto.email,
+    role: dto.role,
+    displayName: dto.display_name,
+    avatarUrl: dto.avatar_url,
+    createdAt: new Date(dto.created_at),
+  };
 }
 
 function isAuthRequest(config: InternalAxiosRequestConfig | undefined): boolean {

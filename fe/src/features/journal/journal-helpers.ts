@@ -8,14 +8,14 @@ export interface MoodConfig {
   dotColor: string;
 }
 
-export const PRESET_TAGS = [
-  "Nhật ký",
-  "Lịch trình",
-  "Ý tưởng",
-  "Học tập",
-  "Công việc",
-  "Mục tiêu",
-];
+export const PRESET_TAG_KEYS = [
+  "journal",
+  "schedule",
+  "ideas",
+  "study",
+  "work",
+  "goals",
+] as const;
 
 export const MOOD_CONFIGS: MoodConfig[] = [
   {

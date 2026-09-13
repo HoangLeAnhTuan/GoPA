@@ -44,12 +44,25 @@ func TestHealthHandler_ReadinessReturnsServiceUnavailableWhenDependencyFails(t *
 	}
 }
 
+func TestHealthHandler_ReadinessReturnsOKWhenDependenciesReady(t *testing.T) {
+	router := newHealthTestRouter(readinessStub{err: nil})
+	request := httptest.NewRequest(http.MethodGet, "/readyz", nil)
+	response := httptest.NewRecorder()
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
+	}
+}
+
 func newHealthTestRouter(readiness ReadinessChecker) *gin.Engine {
 	return NewRouter(
 		slog.Default(),
 		"http://localhost:5173",
 		NewHealthHandler(readiness),
 		NewAuthHandler(authServiceStub{}, time.Hour, false),
+		nil,
 		nil,
 		nil,
 		nil,

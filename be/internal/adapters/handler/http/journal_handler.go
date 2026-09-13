@@ -100,7 +100,9 @@ type journalRequest struct {
 	Content       string              `json:"content"`
 	Tags          []string            `json:"tags"`
 	Mood          *domain.JournalMood `json:"mood"`
-	PublishedDate *time.Time          `json:"published_date"`
+	EnergyLevel   *int16              `json:"energy_level"`
+	Pinned        *bool               `json:"pinned"`
+	PublishedDate *FlexibleDate       `json:"published_date"`
 }
 
 func (h *JournalHandler) create(c *gin.Context) {
@@ -113,7 +115,9 @@ func (h *JournalHandler) create(c *gin.Context) {
 		Content:       req.Content,
 		Tags:          req.Tags,
 		Mood:          req.Mood,
-		PublishedDate: req.PublishedDate,
+		EnergyLevel:   req.EnergyLevel,
+		Pinned:        req.Pinned,
+		PublishedDate: req.PublishedDate.Time(),
 	})
 	if err != nil {
 		response.Fail(c, err)
@@ -136,7 +140,9 @@ func (h *JournalHandler) update(c *gin.Context) {
 		Content:       req.Content,
 		Tags:          req.Tags,
 		Mood:          req.Mood,
-		PublishedDate: req.PublishedDate,
+		EnergyLevel:   req.EnergyLevel,
+		Pinned:        req.Pinned,
+		PublishedDate: req.PublishedDate.Time(),
 	})
 	if err != nil {
 		response.Fail(c, err)

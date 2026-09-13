@@ -1,1 +1,58 @@
-{"title":"Deep Work","description":"Capture, organize, and complete the work that matters.","form":{"title":"Task title","placeholder":"What needs your focus?","add":"Add task"},"status":{"TODO":"To do","IN_PROGRESS":"In progress","DONE":"Done"},"priority":{"low":"Low","medium":"Medium","high":"High"},"category":{"work":"Work","study":"Study","life":"Life"},"actions":{"move":"Move forward","delete":"Delete task"},"complete":"Completed","empty":"Nothing here yet."}
+{
+  "title": "Deep Work",
+  "description": "Capture, organize, and complete the work that matters.",
+  "headerTitle": "Task Management & Kanban",
+  "headerDescription": "Plan, organize, and optimize focus time with Pomodoro estimation.",
+  "form": {
+    "title": "Task title",
+    "placeholder": "What needs your focus?",
+    "quickAddPlaceholder": "What do you want to accomplish next? (Press Enter to create)",
+    "pomodoro": "Pomodoro:",
+    "add": "Add Task",
+    "titleRequired": "Please enter a task title",
+    "createFailed": "Failed to create task. Please try again."
+  },
+  "columns": {
+    "TODO": "To Do",
+    "IN_PROGRESS": "In Progress",
+    "DONE": "Done"
+  },
+  "status": {
+    "TODO": "To do",
+    "IN_PROGRESS": "In progress",
+    "DONE": "Done"
+  },
+  "priority": {
+    "low": "Low priority",
+    "medium": "Medium",
+    "high": "High priority",
+    "urgent": "🚨 Urgent"
+  },
+  "priorityOptions": {
+    "LOW": "Low priority",
+    "MEDIUM": "Medium",
+    "HIGH": "High priority",
+    "URGENT": "🚨 Urgent"
+  },
+  "category": {
+    "work": "Work",
+    "study": "Study",
+    "life": "Life",
+    "leetcode": "💻 LeetCode"
+  },
+  "categoryOptions": {
+    "WORK": "Work",
+    "STUDY": "Study",
+    "LEETCODE": "💻 LeetCode",
+    "LIFE": "Life"
+  },
+  "actions": {
+    "move": "Move forward",
+    "prevStatus": "Move to previous status",
+    "nextStatus": "Move to next status",
+    "delete": "Delete task"
+  },
+  "complete": "Completed",
+  "empty": "Nothing here yet.",
+  "columnEmpty": "No tasks in this column"
+}

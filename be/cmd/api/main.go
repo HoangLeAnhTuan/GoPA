@@ -13,6 +13,8 @@ import (
 	"gopa/internal/adapters/broker"
 	"gopa/internal/adapters/cache"
 	httpadapter "gopa/internal/adapters/handler/http"
+	"gopa/internal/adapters/handler/http/ws"
+	"gopa/internal/adapters/outbox"
 	"gopa/internal/adapters/repository"
 	"gopa/internal/services"
 	"gopa/pkg/config"
@@ -91,7 +93,14 @@ func run() error {
 	linguisticsHandler := httpadapter.NewLinguisticsHandler(services.NewVocabularyService(vocabularyRepository))
 	financeHandler := httpadapter.NewFinanceHandler(services.NewFinanceService(financeRepository, budgetRepository, savingsGoalRepository))
 	journalHandler := httpadapter.NewJournalHandler(services.NewJournalService(journalRepository))
-	pomodoroHandler := httpadapter.NewPomodoroHandler(services.NewPomodoroService(pomodoroStore, pomodoroHistoryRepository))
+	pomodoroService := services.NewPomodoroService(pomodoroStore, pomodoroHistoryRepository)
+	pomodoroHandler := httpadapter.NewPomodoroHandler(pomodoroService)
+	pomodoroWS := ws.NewPomodoroWSGateway(pomodoroService, pomodoroStore, log, cfg.WebOrigin)
+
+	outboxRelay := outbox.NewOutboxRelay(db, brokerConnection, log)
+	relayCtx, cancelRelay := context.WithCancel(context.Background())
+	defer cancelRelay()
+	go outboxRelay.Start(relayCtx)
 
 	router := httpadapter.NewRouter(
 		log,
@@ -103,6 +112,7 @@ func run() error {
 		financeHandler,
 		journalHandler,
 		pomodoroHandler,
+		pomodoroWS,
 		tokens,
 		rateLimiter,
 	)
@@ -122,6 +132,7 @@ func run() error {
 		return nil
 	case <-shutdownSignal.Done():
 		log.Info("api shutdown started")
+		cancelRelay()
 		shutdownCtx, cancelShutdown := context.WithTimeout(context.Background(), cfg.ShutdownTimeout)
 		defer cancelShutdown()
 		if err := server.Shutdown(shutdownCtx); err != nil {

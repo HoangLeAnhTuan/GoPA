@@ -39,12 +39,20 @@ func (s *PomodoroStore) Set(ctx context.Context, userID uuid.UUID, state domain.
 	if err := s.client.Set(ctx, pomodoroKey(userID), raw, 24*time.Hour).Err(); err != nil {
 		return fmt.Errorf("set pomodoro state: %w", err)
 	}
+	_ = s.client.Publish(ctx, pomodoroChannel(userID), raw).Err()
 	return nil
 }
 func (s *PomodoroStore) Delete(ctx context.Context, userID uuid.UUID) error {
 	if err := s.client.Del(ctx, pomodoroKey(userID)).Err(); err != nil {
 		return fmt.Errorf("delete pomodoro state: %w", err)
 	}
+	_ = s.client.Publish(ctx, pomodoroChannel(userID), []byte("null")).Err()
 	return nil
 }
+func (s *PomodoroStore) Subscribe(ctx context.Context, userID uuid.UUID) *redis.PubSub {
+	return s.client.Subscribe(ctx, pomodoroChannel(userID))
+}
 func pomodoroKey(userID uuid.UUID) string { return constants.CachePomodoroStateKey + userID.String() }
+func pomodoroChannel(userID uuid.UUID) string {
+	return constants.CachePomodoroChannelPrefix + userID.String()
+}

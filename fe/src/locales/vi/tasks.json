@@ -1,1 +1,58 @@
-{"title":"Làm việc sâu","description":"Ghi lại, sắp xếp và hoàn thành công việc quan trọng.","form":{"title":"Tên công việc","placeholder":"Việc nào cần sự tập trung của bạn?","add":"Thêm công việc"},"status":{"TODO":"Cần làm","IN_PROGRESS":"Đang làm","DONE":"Hoàn thành"},"priority":{"low":"Thấp","medium":"Trung bình","high":"Cao"},"category":{"work":"Công việc","study":"Học tập","life":"Cuộc sống"},"actions":{"move":"Chuyển tiếp","delete":"Xóa công việc"},"complete":"Đã hoàn thành","empty":"Chưa có công việc."}
+{
+  "title": "Làm việc sâu",
+  "description": "Ghi lại, sắp xếp và hoàn thành công việc quan trọng.",
+  "headerTitle": "Quản lý công việc & Kanban",
+  "headerDescription": "Lập kế hoạch, theo dõi tiến độ và tối ưu thời gian với ước lượng Pomodoro.",
+  "form": {
+    "title": "Tên công việc",
+    "placeholder": "Việc nào cần sự tập trung của bạn?",
+    "quickAddPlaceholder": "Bạn muốn hoàn thành việc gì tiếp theo? (nhấn Enter để tạo nhanh)",
+    "pomodoro": "Pomodoro:",
+    "add": "Thêm việc",
+    "titleRequired": "Vui lòng nhập tiêu đề công việc",
+    "createFailed": "Không thể tạo công việc. Vui lòng thử lại."
+  },
+  "columns": {
+    "TODO": "Cần làm (To Do)",
+    "IN_PROGRESS": "Đang làm (In Progress)",
+    "DONE": "Hoàn thành (Done)"
+  },
+  "status": {
+    "TODO": "Cần làm",
+    "IN_PROGRESS": "Đang làm",
+    "DONE": "Hoàn thành"
+  },
+  "priority": {
+    "low": "Ưu tiên thấp",
+    "medium": "Bình thường",
+    "high": "Ưu tiên cao",
+    "urgent": "🚨 Khẩn cấp"
+  },
+  "priorityOptions": {
+    "LOW": "Ưu tiên thấp",
+    "MEDIUM": "Bình thường",
+    "HIGH": "Ưu tiên cao",
+    "URGENT": "🚨 Khẩn cấp"
+  },
+  "category": {
+    "work": "Công việc",
+    "study": "Học tập",
+    "life": "Đời sống",
+    "leetcode": "💻 LeetCode"
+  },
+  "categoryOptions": {
+    "WORK": "Công việc (Work)",
+    "STUDY": "Học tập (Study)",
+    "LEETCODE": "💻 LeetCode",
+    "LIFE": "Đời sống (Life)"
+  },
+  "actions": {
+    "move": "Chuyển tiếp",
+    "prevStatus": "Chuyển về trạng thái trước",
+    "nextStatus": "Chuyển sang trạng thái tiếp theo",
+    "delete": "Xóa tác vụ"
+  },
+  "complete": "Đã hoàn thành",
+  "empty": "Chưa có công việc.",
+  "columnEmpty": "Chưa có công việc trong mục này"
+}

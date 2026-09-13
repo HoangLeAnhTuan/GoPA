@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowDownRight, ArrowUpRight, Check, Landmark, Plus, ReceiptText, SlidersHorizontal, Sparkles, Tags, WalletCards } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Check, Landmark, PieChart, Plus, ReceiptText, SlidersHorizontal, Sparkles, Tags, Target, WalletCards } from "lucide-react";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -61,7 +62,25 @@ export function FinancePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader title={t("title")} description={t("description")} />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <PageHeader title={t("title")} description={t("description")} />
+        <div className="flex items-center gap-2">
+          <Link
+            to="/app/finance/budgets"
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 text-xs font-semibold text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
+          >
+            <PieChart className="h-3.5 w-3.5 text-amber-400" />
+            {t("tabs.budgets")}
+          </Link>
+          <Link
+            to="/app/finance/goals"
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 text-xs font-semibold text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
+          >
+            <Target className="h-3.5 w-3.5 text-violet-400" />
+            {t("tabs.goals")}
+          </Link>
+        </div>
+      </div>
 
       {/* 4 overview metric cards */}
       <FinanceOverview />

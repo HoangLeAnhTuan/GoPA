@@ -12,6 +12,9 @@ export interface Journal {
   content: string;
   tags: string[];
   mood?: JournalMood | null;
+  energy_level?: number | null;
+  pinned?: boolean;
+  word_count?: number;
   published_date: string;
   created_at: string;
   updated_at: string;
@@ -22,6 +25,8 @@ export interface JournalInput {
   content: string;
   tags: string[];
   mood?: JournalMood | null;
+  energy_level?: number | null;
+  pinned?: boolean;
   published_date?: string;
 }
 
@@ -41,4 +46,3 @@ export interface JournalStats {
   entries: number;
   mood_counts: Record<JournalMood, number>;
 }
-

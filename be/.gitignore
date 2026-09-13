@@ -1,3 +1,82 @@
-.env
+# ==========================================
+# GoPA Backend — Git Ignore Specification
+# ==========================================
+
+# Compiled Binaries & Executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
 bin/
+dist/
+
+# Application specific build outputs in be/ root
+/api
+/api.exe
+/worker
+/worker.exe
+/migrate
+/migrate.exe
+
+# Environment Variables & Secrets
+.env
+.env.*
+.env.local
+!.env.example
+
+# Test & Coverage Outputs
+*.out
 coverage.out
+coverage.html
+coverage.txt
+profile.out
+*.prof
+
+# Go Module Vendor (if used locally)
+vendor/
+
+# Temporary & Cache Files
+tmp/
+temp/
+.cache/
+
+# Logs
+*.log
+logs/
+
+# JetBrains IDE (GoLand / IntelliJ)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Visual Studio Code
+.vscode/
+
+# Vim / Emacs Swap Files
+*~
+*.swp
+*.swo
+*.swn
+.#*
+
+# Operating System Specific
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Local Database Dumps & Test Storage
+data/
+*.db
+*.sqlite

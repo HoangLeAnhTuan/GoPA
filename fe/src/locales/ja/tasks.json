@@ -1,1 +1,58 @@
-{"title":"集中作業","description":"大切な作業を記録、整理、完了します。","form":{"title":"タスク名","placeholder":"何に集中しますか？","add":"タスクを追加"},"status":{"TODO":"未着手","IN_PROGRESS":"進行中","DONE":"完了"},"priority":{"low":"低","medium":"中","high":"高"},"category":{"work":"仕事","study":"学習","life":"生活"},"actions":{"move":"次へ移動","delete":"タスクを削除"},"complete":"完了","empty":"まだタスクはありません。"}
+{
+  "title": "集中作業",
+  "description": "大切な作業を記録、整理、完了します。",
+  "headerTitle": "タスク管理 ＆ カンバン",
+  "headerDescription": "ポモドーロ見積もりを活用し、計画、進捗追跡、集中時間を最適化します。",
+  "form": {
+    "title": "タスク名",
+    "placeholder": "何に集中しますか？",
+    "quickAddPlaceholder": "次に完了したいタスクは何ですか？ (Enterで即時作成)",
+    "pomodoro": "ポモドーロ:",
+    "add": "タスク追加",
+    "titleRequired": "タスクのタイトルを入力してください",
+    "createFailed": "タスクの作成に失敗しました。もう一度お試しください。"
+  },
+  "columns": {
+    "TODO": "未着手 (To Do)",
+    "IN_PROGRESS": "進行中 (In Progress)",
+    "DONE": "完了 (Done)"
+  },
+  "status": {
+    "TODO": "未着手",
+    "IN_PROGRESS": "進行中",
+    "DONE": "完了"
+  },
+  "priority": {
+    "low": "優先度：低",
+    "medium": "優先度：中",
+    "high": "優先度：高",
+    "urgent": "🚨 緊急"
+  },
+  "priorityOptions": {
+    "LOW": "優先度：低",
+    "MEDIUM": "普通",
+    "HIGH": "優先度：高",
+    "URGENT": "🚨 緊急"
+  },
+  "category": {
+    "work": "仕事",
+    "study": "学習",
+    "life": "生活",
+    "leetcode": "💻 LeetCode"
+  },
+  "categoryOptions": {
+    "WORK": "仕事 (Work)",
+    "STUDY": "学習 (Study)",
+    "LEETCODE": "💻 LeetCode",
+    "LIFE": "生活 (Life)"
+  },
+  "actions": {
+    "move": "次へ移動",
+    "prevStatus": "前の状態に戻す",
+    "nextStatus": "次の状態へ進める",
+    "delete": "タスクを削除"
+  },
+  "complete": "完了",
+  "empty": "まだタスクはありません。",
+  "columnEmpty": "この項目にはタスクがありません"
+}

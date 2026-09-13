@@ -1,11 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { cn } from "../../lib/cn";
 
-interface AmountDisplayProps {
-  amount: string;
-  currency: string;
+export interface AmountDisplayProps {
+  amount: string | number;
+  currency?: string;
   className?: string;
   signed?: "positive" | "negative" | "neutral";
+  colorize?: boolean;
 }
 
 function numberLocale(language: string | undefined) {
@@ -14,11 +15,18 @@ function numberLocale(language: string | undefined) {
   return "en-US";
 }
 
-export function AmountDisplay({ amount, currency, className, signed = "neutral" }: AmountDisplayProps) {
+export function AmountDisplay({
+  amount,
+  currency = "VND",
+  className,
+  signed = "neutral",
+  colorize = true,
+}: AmountDisplayProps) {
   const { i18n } = useTranslation();
-  const numeric = Number(amount);
+  const numeric = typeof amount === "number" ? amount : Number(amount);
   const absolute = Number.isFinite(numeric) ? Math.abs(numeric) : 0;
   const value = signed === "negative" ? -absolute : signed === "positive" ? absolute : numeric;
+  
   const formatted = new Intl.NumberFormat(numberLocale(i18n.resolvedLanguage), {
     style: "currency",
     currency,
@@ -26,5 +34,20 @@ export function AmountDisplay({ amount, currency, className, signed = "neutral" 
     signDisplay: signed === "neutral" ? "auto" : "always",
   }).format(Number.isFinite(value) ? value : 0);
 
-  return <span className={cn("tabular-nums", signed === "positive" && "text-emerald-500", signed === "negative" && "text-rose-500", className)}>{formatted}</span>;
+  const isPositive = signed === "positive" || (signed === "neutral" && numeric > 0);
+  const isNegative = signed === "negative" || (signed === "neutral" && numeric < 0);
+
+  const colorClass = colorize
+    ? isPositive && signed !== "neutral"
+      ? "text-emerald-400 dark:text-emerald-400 font-semibold"
+      : isNegative && signed !== "neutral"
+      ? "text-rose-400 dark:text-rose-400 font-semibold"
+      : ""
+    : "";
+
+  return (
+    <span className={cn("font-mono tabular-nums tracking-tight", colorClass, className)}>
+      {formatted}
+    </span>
+  );
 }

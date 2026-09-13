@@ -117,6 +117,11 @@ func (t *Transaction) Validate() error {
 	return normalizeTags(&t.Tags)
 }
 
+// ConvertedAmount calculates the transaction amount in the account's base currency using the exchange rate.
+func (t Transaction) ConvertedAmount() decimal.Decimal {
+	return t.Amount.Mul(t.ExchangeRate)
+}
+
 type BudgetPeriod string
 
 const (
@@ -186,6 +191,23 @@ type CashflowSummary struct {
 	Expense     decimal.Decimal `json:"expense"`
 	Net         decimal.Decimal `json:"net"`
 	SavingsRate decimal.Decimal `json:"savings_rate"`
+}
+
+// CalculateCashflow computes net cashflow and percentage savings rate from income and expense.
+// When income is positive, savings rate is (net / income) * 100 rounded to 2 decimal places.
+// When income is zero or negative, savings rate defaults to 0.
+func CalculateCashflow(income, expense decimal.Decimal) CashflowSummary {
+	net := income.Sub(expense)
+	rate := decimal.Zero
+	if income.IsPositive() {
+		rate = net.Div(income).Mul(decimal.NewFromInt(100)).Round(2)
+	}
+	return CashflowSummary{
+		Income:      income,
+		Expense:     expense,
+		Net:         net,
+		SavingsRate: rate,
+	}
 }
 
 type CategorySpending struct {

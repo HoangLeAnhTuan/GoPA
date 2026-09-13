@@ -6,7 +6,15 @@
   "backToList": "Quay lại danh sách",
   "editTitle": "Chỉnh sửa nhật ký",
   "newTitle": "Tạo nhật ký mới",
-  "presetTagNotice": "Bấm thẻ tag để chọn nhanh",
+  "presetTagNotice": "Bộ chọn thẻ nhanh",
+  "presetTags": {
+    "journal": "Nhật ký",
+    "schedule": "Lịch trình",
+    "ideas": "Ý tưởng",
+    "study": "Học tập",
+    "work": "Công việc",
+    "goals": "Mục tiêu"
+  },
   "confirm": "Xác nhận",
   "cancel": "Hủy",
   "chars": "ký tự",
@@ -52,11 +60,30 @@
     "unlink": "Hủy liên kết"
   },
   "form": {
-    "title": "Tiêu đề bài viết",
-    "tags": "Thẻ (ví dụ: kiến trúc, refactor, học tập)",
-    "content": "Soạn thảo ghi chú Markdown tại đây..."
+    "title": "Tiêu đề nhật ký",
+    "tags": "Thẻ tag (vd: kiến trúc, refactor, học tập)",
+    "content": "Soạn thảo ghi chú Markdown tại đây...",
+    "titleRequired": "Vui lòng nhập tiêu đề bài viết",
+    "saveSuccess": "Đã lưu bài viết thành công",
+    "saveFailed": "Không thể lưu bài viết. Vui lòng thử lại."
   },
   "save": "Lưu mục nhật ký",
   "delete": "Xóa mục nhật ký",
-  "confirmDelete": "Xóa vĩnh viễn mục nhật ký này?"
+  "confirmDelete": "Xóa vĩnh viễn mục nhật ký này?",
+  "detail": {
+    "pinned": "Đã ghim",
+    "unpin": "Bỏ ghim",
+    "pin": "Ghim",
+    "exportMd": "Xuất .md",
+    "delete": "Xóa",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa bài viết \"{{title}}\"?",
+    "moodLabel": "Tâm trạng: {{mood}}",
+    "energyLabel": "Năng lượng: {{level}}/5",
+    "backlinksTitle": "Mạng lưới kiến thức liên kết",
+    "linkNote": "+ Liên kết ghi chú",
+    "selectEntry": "Chọn bài viết để kết nối...",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy",
+    "backlinksDesc": "Kết nối suy nghĩ và ghi chép để tạo mạng lưới kiến thức cá nhân sinh động."
+  }
 }

@@ -1,0 +1,62 @@
+# ==========================================
+# GoPA Root — Git Ignore Specification
+# ==========================================
+
+# Python cache & build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Node & Frontend build
+node_modules/
+dist/
+.vite/
+
+# Compiled Binaries & Go Executables
+*.exe
+*.exe~
+*.dll
+*.dylib
+*.test
+bin/
+
+# Environment Variables & Secrets
+.env
+.env.*
+.env.local
+!.env.example
+
+# IDE & Editor files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*~
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -20,14 +20,26 @@ type Identity struct {
 
 func Authenticate(tokens *utils.TokenManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var tokenStr string
 		header := c.GetHeader("Authorization")
-		parts := strings.SplitN(header, " ", 2)
-		if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") || strings.TrimSpace(parts[1]) == "" {
+		if header != "" {
+			parts := strings.SplitN(header, " ", 2)
+			if len(parts) == 2 && strings.EqualFold(parts[0], "Bearer") {
+				tokenStr = strings.TrimSpace(parts[1])
+			}
+		}
+		if tokenStr == "" {
+			tokenStr = strings.TrimSpace(c.Query("token"))
+		}
+		if tokenStr == "" {
+			tokenStr = strings.TrimSpace(c.Query("access_token"))
+		}
+		if tokenStr == "" {
 			response.Fail(c, domain.ErrUnauthorized)
 			c.Abort()
 			return
 		}
-		claims, err := tokens.ParseAccessToken(parts[1])
+		claims, err := tokens.ParseAccessToken(tokenStr)
 		if err != nil {
 			response.Fail(c, domain.ErrUnauthorized)
 			c.Abort()
@@ -40,6 +52,7 @@ func Authenticate(tokens *utils.TokenManager) gin.HandlerFunc {
 			return
 		}
 		c.Set(constants.IdentityKey, Identity{UserID: userID})
+		c.Set("user_id", userID)
 		c.Next()
 	}
 }

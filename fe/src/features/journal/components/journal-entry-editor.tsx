@@ -1,10 +1,11 @@
-import { ArrowLeft, Calendar, Save, Sparkles, Tag as TagIcon, Trash2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, Calendar, Check, Save, Sparkles, Tag as TagIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { GlassPanel } from "../../../components/design-system/glass-panel";
-import { MOOD_CONFIGS, PRESET_TAGS } from "../journal-helpers";
+import { MOOD_CONFIGS, PRESET_TAG_KEYS } from "../journal-helpers";
 import type { Journal, JournalMood } from "../types";
 import { JournalLinkingSection } from "./journal-linking-section";
+import { cn } from "../../../lib/cn";
 
 interface EditorProps {
   selectedId?: string;
@@ -19,6 +20,10 @@ interface EditorProps {
   availableToLink: Journal[];
   handleLink: (linkedId: string) => void;
   onBack?: () => void;
+  titleError?: string | null;
+  submitError?: string | null;
+  successMessage?: string | null;
+  onClearTitleError?: () => void;
 }
 
 export function JournalEntryEditor(p: EditorProps) {
@@ -76,12 +81,28 @@ export function JournalEntryEditor(p: EditorProps) {
         {/* ── Title & Published Date Row ── */}
         <div className="grid gap-3 sm:grid-cols-[1fr_13rem] shrink-0">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">
-              {t("form.title")}
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">
+                {t("form.title")} <span className="text-rose-500">*</span>
+              </label>
+              {p.titleError && (
+                <span className="text-[11px] font-semibold text-rose-500 dark:text-rose-400 flex items-center gap-1 animate-in fade-in">
+                  <AlertCircle size={12} className="shrink-0" />
+                  {p.titleError}
+                </span>
+              )}
+            </div>
             <input
-              className="h-10 w-full rounded-xl border border-slate-200 dark:border-white/15 bg-white/90 dark:bg-white/5 px-4 text-sm font-bold text-foreground focus:ring-2 focus:ring-amber-500/50 focus:border-amber-400/50 outline-none transition-all placeholder:text-muted-foreground/50 shadow-sm hover:border-slate-300 dark:hover:border-white/25"
-              onChange={(e) => p.setTitle(e.target.value)}
+              className={cn(
+                "h-10 w-full rounded-xl border px-4 text-sm font-bold text-foreground outline-none transition-all placeholder:text-muted-foreground/50 shadow-sm",
+                p.titleError
+                  ? "border-rose-500 bg-rose-50/30 focus:ring-2 focus:ring-rose-500/30 dark:border-rose-500 dark:bg-rose-950/20"
+                  : "border-slate-200 dark:border-white/15 bg-white/90 dark:bg-white/5 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-400/50 hover:border-slate-300 dark:hover:border-white/25"
+              )}
+              onChange={(e) => {
+                p.setTitle(e.target.value);
+                if (p.onClearTitleError) p.onClearTitleError();
+              }}
               placeholder={t("form.title")}
               value={p.title}
             />
@@ -140,11 +161,12 @@ export function JournalEntryEditor(p: EditorProps) {
 
           {/* Preset chips */}
           <div className="flex flex-wrap items-center gap-1.5">
-            {PRESET_TAGS.map((tag) => {
+            {PRESET_TAG_KEYS.map((key) => {
+              const tag = t(`presetTags.${key}`, { defaultValue: key });
               const isSelected = currentTagList.includes(tag);
               return (
                 <button
-                  key={tag}
+                  key={key}
                   type="button"
                   onClick={() => togglePresetTag(tag)}
                   className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all hover:scale-[1.02] shadow-sm ${
@@ -186,14 +208,28 @@ export function JournalEntryEditor(p: EditorProps) {
 
         {/* ── Bottom Action Row ── */}
         <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/80 dark:border-white/10 shrink-0 gap-3">
-          <button
-            className="h-10 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 text-xs font-bold text-slate-950 hover:from-amber-400 hover:to-orange-400 disabled:opacity-50 transition-all shadow-md shadow-amber-500/30 flex items-center gap-2 hover:scale-[1.01] hover:shadow-lg hover:shadow-amber-500/35"
-            type="submit"
-            disabled={p.isPending}
-          >
-            <Save size={15} />
-            <span>{t("save")}</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              className="h-10 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 text-xs font-bold text-slate-950 hover:from-amber-400 hover:to-orange-400 disabled:opacity-50 transition-all shadow-md shadow-amber-500/30 flex items-center gap-2 hover:scale-[1.01] hover:shadow-lg hover:shadow-amber-500/35 cursor-pointer"
+              type="submit"
+              disabled={p.isPending}
+            >
+              <Save size={15} />
+              <span>{t("save")}</span>
+            </button>
+            {p.successMessage && (
+              <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 animate-in fade-in">
+                <Check size={14} className="stroke-[2.5]" />
+                <span>{p.successMessage}</span>
+              </span>
+            )}
+            {p.submitError && (
+              <span className="text-xs font-semibold text-rose-500 dark:text-rose-400 flex items-center gap-1.5 animate-in fade-in">
+                <AlertCircle size={14} className="shrink-0" />
+                <span>{p.submitError}</span>
+              </span>
+            )}
+          </div>
 
           {p.selectedId && (
             <div>

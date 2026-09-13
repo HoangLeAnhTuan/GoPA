@@ -10,14 +10,21 @@ const (
 
 // Internal Cache Prefixes
 const (
-	CacheAuthRefreshPrefix = "auth:refresh:"
-	CacheRateLimitPrefix   = "rate:"
-	CachePomodoroStateKey  = "pomodoro:state:"
+	CacheAuthRefreshPrefix     = "auth:refresh:"
+	CacheRateLimitPrefix       = "rate:"
+	CachePomodoroStateKey      = "pomodoro:state:"
+	CachePomodoroChannelPrefix = "pomodoro:channel:"
 )
 
 // Internal Queue & Exchange Names
 const (
 	QueueSRSNotifications = "gopa.queue.srs.notifications"
 	QueuePomodoroHistory  = "gopa.queue.pomodoro.history"
-	ExchangeEvents        = "gopa.exchange.events"
+	QueueSRS              = "gopa.queue.srs"
+	QueuePomodoro         = "gopa.queue.pomodoro"
+	QueueFinance          = "gopa.queue.finance"
+	QueueJournal          = "gopa.queue.journal"
+	QueueDLQ              = "gopa.queue.dlq"
+	ExchangeEvents        = "gopa.events"
+	ExchangeDLX           = "gopa.events.dlx"
 )

@@ -2,6 +2,8 @@ export interface UserDto {
   id: string;
   email: string;
   role: "USER" | "ADMIN";
+  display_name?: string;
+  avatar_url?: string;
   created_at: string;
 }
 
@@ -9,6 +11,8 @@ export interface User {
   id: string;
   email: string;
   role: UserDto["role"];
+  displayName?: string;
+  avatarUrl?: string;
   createdAt: Date;
 }
 
@@ -29,4 +33,10 @@ export interface LoginInput {
 
 export interface RegisterInput extends LoginInput {
   confirmPassword: string;
+  displayName?: string;
+}
+
+export interface UpdateProfileInput {
+  display_name?: string;
+  avatar_url?: string;
 }

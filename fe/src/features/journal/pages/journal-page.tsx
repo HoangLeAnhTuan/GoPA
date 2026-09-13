@@ -43,6 +43,9 @@ export function JournalPage() {
   const [tags, setTags] = useState("");
   const [mood, setMood] = useState<JournalMood | null>(null);
   const [pubDate, setPubDate] = useState(todayStr());
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Debounce search query (300 ms)
   useEffect(() => {
@@ -107,6 +110,9 @@ export function JournalPage() {
       setPubDate(
         selected.published_date ? selected.published_date.slice(0, 10) : todayStr()
       );
+      setTitleError(null);
+      setSubmitError(null);
+      setSuccessMessage(null);
     }
   }, [selected]);
 
@@ -117,6 +123,9 @@ export function JournalPage() {
     setTags("");
     setMood(null);
     setPubDate(todayStr());
+    setTitleError(null);
+    setSubmitError(null);
+    setSuccessMessage(null);
     setViewMode("editor");
   };
 
@@ -128,19 +137,38 @@ export function JournalPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      setTitleError(t("form.titleRequired"));
+      return;
+    }
+    setTitleError(null);
+    setSubmitError(null);
+    setSuccessMessage(null);
+
+    const formattedDate = pubDate ? (pubDate.includes("T") ? pubDate : `${pubDate}T00:00:00Z`) : undefined;
     const input = {
-      title,
+      title: title.trim(),
       content,
       tags: tags.split(",").map((x) => x.trim()).filter(Boolean),
       mood: mood || null,
-      published_date: pubDate || undefined,
+      published_date: formattedDate,
     };
-    if (!selectedId) {
-      const res = await create.mutateAsync(input);
-      setSelectedId(res.id);
-    } else {
-      await update.mutateAsync({ id: selectedId, input });
+    try {
+      if (!selectedId) {
+        const res = await create.mutateAsync(input);
+        setSelectedId(res.id);
+      } else {
+        await update.mutateAsync({ id: selectedId, input });
+      }
+      setSuccessMessage(t("form.saveSuccess"));
+      setTimeout(() => setSuccessMessage(null), 3500);
+    } catch (err: any) {
+      const apiMsg = err?.response?.data?.error?.message;
+      if (apiMsg && typeof apiMsg === "string" && !apiMsg.toLowerCase().includes("status code")) {
+        setSubmitError(apiMsg);
+      } else {
+        setSubmitError(t("form.saveFailed"));
+      }
     }
   };
 
@@ -267,6 +295,10 @@ export function JournalPage() {
               availableToLink={availableToLink}
               handleLink={handleLink}
               onBack={() => setViewMode("list")}
+              titleError={titleError}
+              submitError={submitError}
+              successMessage={successMessage}
+              onClearTitleError={() => setTitleError(null)}
             />
           </motion.div>
         )}

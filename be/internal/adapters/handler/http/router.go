@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/gin-gonic/gin"
+	"gopa/internal/adapters/handler/http/ws"
 	"gopa/internal/core/ports"
 	"gopa/pkg/utils"
 )
@@ -18,6 +19,7 @@ func NewRouter(
 	finance *FinanceHandler,
 	journal *JournalHandler,
 	pomodoro *PomodoroHandler,
+	pomodoroWS *ws.PomodoroWSGateway,
 	tokens *utils.TokenManager,
 	limiter ports.RateLimiter,
 ) *gin.Engine {
@@ -45,6 +47,9 @@ func NewRouter(
 	}
 	if pomodoro != nil {
 		pomodoro.RegisterRoutes(api, authMiddleware)
+	}
+	if pomodoroWS != nil {
+		pomodoroWS.RegisterRoutes(api, authMiddleware)
 	}
 	return router
 }
