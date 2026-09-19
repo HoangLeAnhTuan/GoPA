@@ -1,4 +1,26 @@
+# Dependencies & Build Outputs
 node_modules/
 dist/
+dist-ssr/
+*.tsbuildinfo
+.eslintcache
+
+# Cache & Temporary
+.tmp/
+tmp/
+.cache/
+.vite/
+.turbo/
+
+# Environment Variables & Secrets
 .env
+.env.*
 .env.local
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log

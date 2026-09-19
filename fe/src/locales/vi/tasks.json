@@ -8,6 +8,8 @@
     "placeholder": "Việc nào cần sự tập trung của bạn?",
     "quickAddPlaceholder": "Bạn muốn hoàn thành việc gì tiếp theo? (nhấn Enter để tạo nhanh)",
     "pomodoro": "Pomodoro:",
+    "priorityLabel": "Mức độ ưu tiên",
+    "categoryLabel": "Danh mục công việc",
     "add": "Thêm việc",
     "titleRequired": "Vui lòng nhập tiêu đề công việc",
     "createFailed": "Không thể tạo công việc. Vui lòng thử lại."
@@ -26,24 +28,24 @@
     "low": "Ưu tiên thấp",
     "medium": "Bình thường",
     "high": "Ưu tiên cao",
-    "urgent": "🚨 Khẩn cấp"
+    "urgent": "Khẩn cấp"
   },
   "priorityOptions": {
     "LOW": "Ưu tiên thấp",
     "MEDIUM": "Bình thường",
     "HIGH": "Ưu tiên cao",
-    "URGENT": "🚨 Khẩn cấp"
+    "URGENT": "Khẩn cấp"
   },
   "category": {
     "work": "Công việc",
     "study": "Học tập",
     "life": "Đời sống",
-    "leetcode": "💻 LeetCode"
+    "leetcode": "LeetCode"
   },
   "categoryOptions": {
     "WORK": "Công việc (Work)",
     "STUDY": "Học tập (Study)",
-    "LEETCODE": "💻 LeetCode",
+    "LEETCODE": "LeetCode",
     "LIFE": "Đời sống (Life)"
   },
   "actions": {

@@ -38,9 +38,12 @@ profile.out
 vendor/
 
 # Temporary & Cache Files
+.tmp/
 tmp/
+.temp/
 temp/
 .cache/
+*.cache
 
 # Logs
 *.log

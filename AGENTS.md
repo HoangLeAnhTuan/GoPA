@@ -14,10 +14,11 @@
 
 ---
 
-## 2. The 20 Agent Skills Inventory
+## 2. The 51 Agent Skills Inventory
 
 All skills reside in `g:\GoPA\.agents\skills/`. Every agent operating in this repository must leverage them according to their domain:
 
+### 2.1 Elite UI/UX & Visual Design (20 Skills)
 | # | Skill Name | Path | Core Domain & Focus |
 |---|---|---|---|
 | 1 | `ui-ux-pro-max` | `.agents/skills/ui-ux-pro-max/` | **Local Design Intelligence CLI**: 79 styles, 192 product palettes, 119 UX guidelines (WCAG AA, touch targets, forms, charts), stack guidelines. |
@@ -41,6 +42,50 @@ All skills reside in `g:\GoPA\.agents\skills/`. Every agent operating in this re
 | 19 | `stitch-design-taste` | `.agents/skills/stitch-design-taste/` | **Semantic Design Specs**: Generating machine-readable `DESIGN.md` files. |
 | 20 | `design-taste-frontend-v1` | `.agents/skills/design-taste-frontend-v1/` | **Legacy Taste Reference**: Preserved for backward compatibility. |
 
+### 2.2 Ponytail — Anti-Bloat & Minimalist Engineering (6 Skills + Rule)
+Rule file: `.agents/rules/ponytail.md` (Always active).
+
+| # | Skill Name | Path | Core Domain & Focus |
+|---|---|---|---|
+| 21 | `ponytail` | `.agents/skills/ponytail/` | **Lazy Senior Dev Engine**: Enforces minimal working diffs, stdlib before third-party libs, native features before custom code, YAGNI. Levels: `lite`, `full` (default), `ultra`. |
+| 22 | `ponytail-audit` | `.agents/skills/ponytail-audit/` | **Anti-Bloat Auditor**: Scans codebase for unnecessary abstractions, unused dependencies, dead boilerplate, and over-engineered layers. |
+| 23 | `ponytail-debt` | `.agents/skills/ponytail-debt/` | **Technical Debt Assessor**: Identifies debt created by premature optimization and complex unneeded frameworks. |
+| 24 | `ponytail-gain` | `.agents/skills/ponytail-gain/` | **Efficiency & LOC Benchmark**: Quantifies lines-of-code saved, diff shrinkage, and complexity reductions. |
+| 25 | `ponytail-help` | `.agents/skills/ponytail-help/` | **Ladder & Guidance Reference**: Interactive help for Ponytail ladder rungs and intensity tuning. |
+| 26 | `ponytail-review` | `.agents/skills/ponytail-review/` | **Lazy Reviewer**: Scans PRs/diffs to replace bloated blocks with one-liners or standard library equivalents. |
+
+### 2.3 Production Software Lifecycle — Addy Osmani (25 Skills + References + Personas)
+Supplementary checklists: `.agents/references/` (Accessibility, DoD, Observability, Orchestration, Performance, Security, Testing).
+Personas: `.agents/personas/` (`code-reviewer`, `security-auditor`, `test-engineer`, `web-performance-auditor`).
+
+| # | Skill Name | Path | Core Domain & Focus |
+|---|---|---|---|
+| 27 | `spec-driven-development` | `.agents/skills/spec-driven-development/` | **Define**: Spec before code, requirements clarity, edge-case identification. |
+| 28 | `planning-and-task-breakdown` | `.agents/skills/planning-and-task-breakdown/` | **Plan**: Atomic task breakdown, dependency mapping, incremental milestone planning. |
+| 29 | `idea-refine` | `.agents/skills/idea-refine/` | **Ideate**: Socratic requirement exploration and feature boundary refinement. |
+| 30 | `interview-me` | `.agents/skills/interview-me/` | **Interview**: Proactive requirement interrogation through targeted questions. |
+| 31 | `api-and-interface-design` | `.agents/skills/api-and-interface-design/` | **Contract First**: RESTful/gRPC contract design, schema validation, backward compatibility. |
+| 32 | `incremental-implementation` | `.agents/skills/incremental-implementation/` | **Build**: Step-by-step verified feature slices; small reviewable steps. |
+| 33 | `source-driven-development` | `.agents/skills/source-driven-development/` | **Build**: Grounding changes directly in active codebase patterns rather than hallucinations. |
+| 34 | `frontend-ui-engineering` | `.agents/skills/frontend-ui-engineering/` | **Build**: Robust component architectures, resilient client state, WCAG AA compliance. |
+| 35 | `test-driven-development` | `.agents/skills/test-driven-development/` | **Verify**: Red-green-refactor cycle, integration and unit tests as proof of correctness. |
+| 36 | `browser-testing-with-devtools` | `.agents/skills/browser-testing-with-devtools/` | **Verify**: Headless/DevTools runtime verification, DOM inspection, and console error monitoring. |
+| 37 | `debugging-and-error-recovery` | `.agents/skills/debugging-and-error-recovery/` | **Debug**: Systematic root-cause tracing, reproducible reproduction cases, regression guards. |
+| 38 | `doubt-driven-development` | `.agents/skills/doubt-driven-development/` | **Verify**: Adversarial testing, challenging assumptions, edge-case probing. |
+| 39 | `code-review-and-quality` | `.agents/skills/code-review-and-quality/` | **Review**: 5-axis code review (logic, security, performance, maintainability, tests). |
+| 40 | `code-simplification` | `.agents/skills/code-simplification/` | **Review**: Refactoring for clarity over cleverness, removing accidental complexity. |
+| 41 | `security-and-hardening` | `.agents/skills/security-and-hardening/` | **Security**: OWASP Top 10 defenses, input sanitization, token handling, permission gates. |
+| 42 | `performance-optimization` | `.agents/skills/performance-optimization/` | **Perf**: Latency profiling, memory optimization, database indexing, caching strategies. |
+| 43 | `observability-and-instrumentation` | `.agents/skills/observability-and-instrumentation/` | **Ops**: Structured logging, Prometheus metrics, OpenTelemetry distributed tracing. |
+| 44 | `ci-cd-and-automation` | `.agents/skills/ci-cd-and-automation/` | **Ops**: GitHub Actions workflows, build pipelines, lint gates, release packaging. |
+| 45 | `shipping-and-launch` | `.agents/skills/shipping-and-launch/` | **Ship**: Deployment runbooks, feature flags, rollback readiness, launch checklists. |
+| 46 | `git-workflow-and-versioning` | `.agents/skills/git-workflow-and-versioning/` | **Git**: Clean commit history, semantic versioning, branch strategies, changelog generation. |
+| 47 | `context-engineering` | `.agents/skills/context-engineering/` | **Context**: Context window management, artifact distillation, token optimization. |
+| 48 | `constraint-driven-development` | `.agents/skills/constraint-driven-development/` | **Govern**: Enforcing hard architectural budgets (bundle size, latency, coverage). |
+| 49 | `deprecation-and-migration` | `.agents/skills/deprecation-and-migration/` | **Evolution**: Safe deprecation paths, API migrations, database schema migrations. |
+| 50 | `documentation-and-adrs` | `.agents/skills/documentation-and-adrs/` | **Docs**: Architecture Decision Records (ADR), OpenAPI specs, clear technical documentation. |
+| 51 | `using-agent-skills` | `.agents/skills/using-agent-skills/` | **Meta**: Meta-orchestration of Addy Osmani skills across project phases. |
+
 ---
 
 ## 3. Skill Activation & Trigger Matrix
@@ -50,15 +95,26 @@ When an agent receives a user prompt, consult this matrix to activate the proper
 ```mermaid
 flowchart TD
     Prompt[User Request Received] --> Classify{Classify Intent}
-    Classify -->|New Page / Feature UI| FlowNew[ui-ux-pro-max + design-taste-frontend + high-end-visual-design]
+    Classify -->|Spec / Requirements| FlowSpec[spec-driven-development + interview-me]
+    Classify -->|Task Planning| FlowPlan[planning-and-task-breakdown + constraint-driven-development]
+    Classify -->|New Page / Feature UI| FlowNew[ui-ux-pro-max + design-taste-frontend + high-end-visual-design + frontend-ui-engineering]
     Classify -->|Component Building / Styling| FlowComp[ui-styling + design-system]
-    Classify -->|Refactoring / Audit UI| FlowRefactor[redesign-existing-projects + ui-ux-pro-max]
+    Classify -->|Refactoring / Anti-Bloat| FlowRefactor[ponytail + code-simplification + redesign-existing-projects]
+    Classify -->|Bug Fixing / Debugging| FlowDebug[debugging-and-error-recovery + ponytail]
+    Classify -->|Testing / TDD| FlowTest[test-driven-development + doubt-driven-development]
+    Classify -->|Security & Hardening| FlowSec[security-and-hardening + references/security-checklist.md]
+    Classify -->|Perf & Web Vitals| FlowPerf[performance-optimization + references/performance-checklist.md]
+    Classify -->|Review & Pre-merge| FlowReview[code-review-and-quality + ponytail-review]
     Classify -->|Motion / Animation| FlowMotion[high-end-visual-design + gpt-taste]
     Classify -->|Icons / Logos / Banners| FlowMedia[design + banner-design + brandkit]
-    Classify -->|Writing Any Code| Enforce[full-output-enforcement - MANDATORY]
+    Classify -->|Writing Any Code| Enforce[full-output-enforcement & ponytail - MANDATORY]
     FlowNew --> Enforce
     FlowComp --> Enforce
     FlowRefactor --> Enforce
+    FlowDebug --> Enforce
+    FlowTest --> Enforce
+    FlowSec --> Enforce
+    FlowPerf --> Enforce
     FlowMotion --> Enforce
 ```
 
@@ -66,11 +122,15 @@ flowchart TD
 
 | Task / Scenario | Required Primary Skills | Mandatory Action |
 |---|---|---|
-| **Designing a new view or module** | `ui-ux-pro-max`<br>`design-taste-frontend`<br>`high-end-visual-design` | 1. Output a 1-line "Design Read" (Brief inference).<br>2. Run `search.py` for product patterns & palette.<br>3. Apply Double-Bezel architecture and asymmetric bento layouts. |
+| **Defining & planning a new feature** | `spec-driven-development`<br>`planning-and-task-breakdown`<br>`interview-me` | 1. Spec before code: clear acceptance criteria.<br>2. Break into atomic, testable slices.<br>3. Consult Definition of Done in `.agents/references/definition-of-done.md`. |
+| **Designing a new view or module** | `ui-ux-pro-max`<br>`design-taste-frontend`<br>`high-end-visual-design`<br>`frontend-ui-engineering` | 1. Output a 1-line "Design Read" (Brief inference).<br>2. Run `search.py` for product patterns & palette.<br>3. Apply Double-Bezel architecture and asymmetric bento layouts. |
 | **Styling components / forms / tables** | `ui-styling`<br>`design-system` | 1. Use shadcn/Radix accessible primitives.<br>2. Adhere to 3-layer tokens (Primitive → Semantic → Component).<br>3. Ensure 44×44px touch targets and visible focus rings. |
-| **Refactoring existing components** | `redesign-existing-projects`<br>`ui-ux-pro-max` | 1. Run the Design Audit checklist (typography, contrast, optical alignment).<br>2. Replace generic 1px gray borders and black shadows with tinted borders/shadows.<br>3. Ensure all 4 states (skeleton, empty, error, success) exist. |
+| **Writing code / Fixing bugs** | `ponytail`<br>`incremental-implementation`<br>`full-output-enforcement` | 1. Apply Ponytail ladder: YAGNI → reuse existing code → stdlib → native platform → minimal diff.<br>2. Root-cause fix (grep callers, fix at shared source).<br>3. Zero truncation (`full-output-enforcement`). |
+| **Writing tests / TDD** | `test-driven-development`<br>`doubt-driven-development` | 1. Red-green-refactor cycle.<br>2. Cover critical paths, boundary conditions, and failure states. |
+| **Security audit & hardening** | `security-and-hardening` | Check against `.agents/references/security-checklist.md` (OWASP, SQL injection, auth/token safety, CSRF/CORS). |
+| **Performance tuning** | `performance-optimization` | Check against `.agents/references/performance-checklist.md` (profiling, query optimization, indexing, caching). |
+| **Refactoring & Code Review** | `code-review-and-quality`<br>`ponytail-review`<br>`code-simplification` | 1. 5-axis review.<br>2. Strip dead code, unnecessary wrappers, and bloated abstractions.<br>3. Ensure clarity over cleverness. |
 | **Implementing animations & transitions** | `high-end-visual-design`<br>`gpt-taste` | 1. Use custom cubic-bezier: `cubic-bezier(0.32, 0.72, 0, 1)`.<br>2. Animate exclusively via `transform` and `opacity` (GPU-safe).<br>3. Never use `useState` for continuous mouse/scroll values; isolate motion to client leaf components. |
-| **Writing or editing code files** | `full-output-enforcement` | **STRICT BAN** on `// ...`, `// TODO`, `// implement here`. Every file must be complete, typed, and runnable. |
 | **Creating branding, badges, banners** | `design`<br>`brand`<br>`banner-design` | Follow brand voice guidelines, generate clean SVG icons or high-contrast graphics. |
 
 ---

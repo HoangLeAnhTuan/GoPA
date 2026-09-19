@@ -35,7 +35,7 @@ func NewAuthHandler(service AuthApplication, refreshTTL time.Duration, secureCoo
 
 func (h *AuthHandler) RegisterRoutes(api *gin.RouterGroup, authenticate gin.HandlerFunc, limiter ports.RateLimiter) {
 	auth := api.Group("/auth")
-	auth.POST("/register", h.register)
+	auth.POST("/register", rateLimit(limiter, "register", 5, time.Minute), h.register)
 	auth.POST("/login", rateLimit(limiter, "login", 5, time.Minute), h.login)
 	auth.POST("/refresh", rateLimit(limiter, "refresh", 10, time.Minute), h.refresh)
 	auth.POST("/logout", h.logout)
@@ -156,7 +156,8 @@ func (h *AuthHandler) setRefreshCookie(c *gin.Context, token string) {
 		MaxAge:   int(h.refreshTTL.Seconds()),
 		HttpOnly: true,
 		Secure:   h.secureCookies,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(h.refreshTTL),
 	})
 }
 
@@ -168,7 +169,8 @@ func (h *AuthHandler) clearRefreshCookie(c *gin.Context) {
 		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   h.secureCookies,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Unix(1, 0),
 	})
 }
 

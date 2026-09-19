@@ -2,15 +2,61 @@
 # GoPA Root — Git Ignore Specification
 # ==========================================
 
-# Python cache & build artifacts
+# Temporary & Cache Directories (Crucial: prevents build/mod cache floods)
+.tmp/
+tmp/
+.temp/
+temp/
+.cache/
+*.cache
+
+# Compiled Binaries & Go Executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+bin/
+be/bin/
+be/api
+be/api.exe
+be/worker
+be/worker.exe
+be/migrate
+be/migrate.exe
+
+# Go Module Vendor (if used locally)
+vendor/
+
+# Test & Coverage Outputs
+*.out
+coverage.out
+coverage.html
+coverage.txt
+profile.out
+*.prof
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Node & Frontend Build Artifacts
+node_modules/
+dist/
+dist-ssr/
+.vite/
+.turbo/
+.eslintcache
+*.tsbuildinfo
+
+# Python Cache & Build Artifacts
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -23,40 +69,56 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-.pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
+venv/
+.venv/
+env/
 
-# Node & Frontend build
-node_modules/
-dist/
-.vite/
+# Logs & Debug Output
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Compiled Binaries & Go Executables
-*.exe
-*.exe~
-*.dll
-*.dylib
-*.test
-bin/
-
-# Environment Variables & Secrets
+# Environment Variables & Secrets (Keep example files)
 .env
 .env.*
 .env.local
 !.env.example
 
-# IDE & Editor files
+# Local Database Dumps & Test Storage
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Claude Code Agent Files
+# Keep: .agents/rules/ and .agents/personas/ (project-specific config)
+# Ignore: bundled skills and references (managed by Claude Code, not the project)
+.agents/skills/
+.agents/references/
+
+# IDE & Editor Files
 .idea/
 *.iml
 *.iws
 *.ipr
 .vscode/
 *.swp
+*.swo
+*.swn
 *~
+.#*
 
 # Operating System Files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
-desktop.ini
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+

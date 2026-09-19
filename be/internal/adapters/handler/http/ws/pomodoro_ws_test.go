@@ -100,11 +100,14 @@ func TestPomodoroWSGateway_OriginCheck(t *testing.T) {
 
 	reqLocalhost, _ := http.NewRequest(http.MethodGet, "/ws", nil)
 	reqLocalhost.Header.Set("Origin", "http://127.0.0.1:3000")
-	assert.True(t, gateway.checkOrigin(reqLocalhost))
+	assert.False(t, gateway.checkOrigin(reqLocalhost))
 
 	reqForbidden, _ := http.NewRequest(http.MethodGet, "/ws", nil)
 	reqForbidden.Header.Set("Origin", "https://malicious-site.com")
 	assert.False(t, gateway.checkOrigin(reqForbidden))
+
+	wildcardGateway := NewPomodoroWSGateway(nil, nil, slog.Default(), "*")
+	assert.True(t, wildcardGateway.checkOrigin(reqForbidden))
 }
 
 func TestPomodoroWSGateway_HandshakeAndInitialState(t *testing.T) {

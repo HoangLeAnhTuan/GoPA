@@ -70,6 +70,21 @@ func Load() (Config, error) {
 }
 
 func (c Config) Validate() error {
+	if strings.TrimSpace(c.HTTPAddr) == "" {
+		return fmt.Errorf("HTTP_ADDR is required")
+	}
+	if strings.TrimSpace(c.RedisAddr) == "" {
+		return fmt.Errorf("REDIS_ADDR is required")
+	}
+	if strings.TrimSpace(c.JWTIssuer) == "" {
+		return fmt.Errorf("JWT_ISSUER is required")
+	}
+	if strings.TrimSpace(c.JWTAccessSecret) == "" {
+		return fmt.Errorf("JWT_ACCESS_SECRET is required")
+	}
+	if strings.TrimSpace(c.WebOrigin) == "" {
+		return fmt.Errorf("WEB_ORIGIN is required")
+	}
 	if c.AppEnv != constants.Development && c.AppEnv != constants.Test && c.AppEnv != constants.Production {
 		return fmt.Errorf("APP_ENV must be development, test, or production")
 	}
@@ -79,11 +94,22 @@ func (c Config) Validate() error {
 	if c.BcryptCost < 10 || c.BcryptCost > 14 {
 		return fmt.Errorf("BCRYPT_COST must be between 10 and 14")
 	}
-	if _, err := url.ParseRequestURI(c.PostgresDSN); err != nil {
-		return fmt.Errorf("POSTGRES_DSN must be a valid URL")
+	postgresURL, err := url.ParseRequestURI(c.PostgresDSN)
+	if err != nil || (postgresURL.Scheme != "postgres" && postgresURL.Scheme != "postgresql") || postgresURL.Host == "" {
+		return fmt.Errorf("POSTGRES_DSN must be a valid postgres URL")
 	}
-	if _, err := url.ParseRequestURI(c.RabbitMQURL); err != nil {
-		return fmt.Errorf("RABBITMQ_URL must be a valid URL")
+	rabbitURL, err := url.ParseRequestURI(c.RabbitMQURL)
+	if err != nil || (rabbitURL.Scheme != "amqp" && rabbitURL.Scheme != "amqps") || rabbitURL.Host == "" {
+		return fmt.Errorf("RABBITMQ_URL must be a valid amqp URL")
+	}
+	if c.WebOrigin != "*" {
+		originURL, originErr := url.ParseRequestURI(c.WebOrigin)
+		if originErr != nil || (originURL.Scheme != "http" && originURL.Scheme != "https") || originURL.Host == "" || (originURL.Path != "" && originURL.Path != "/") || originURL.RawQuery != "" || originURL.Fragment != "" {
+			return fmt.Errorf("WEB_ORIGIN must be an http(s) origin without a path, query, or fragment")
+		}
+	}
+	if c.LogLevel != "debug" && c.LogLevel != "info" && c.LogLevel != "warn" && c.LogLevel != "warning" && c.LogLevel != "error" {
+		return fmt.Errorf("LOG_LEVEL must be debug, info, warn, warning, or error")
 	}
 	if c.AppEnv == constants.Production {
 		if c.JWTAccessSecret == constants.ExampleJWTSecret || len(c.JWTAccessSecret) < 32 {
@@ -91,6 +117,9 @@ func (c Config) Validate() error {
 		}
 		if c.WebOrigin == "*" {
 			return fmt.Errorf("WEB_ORIGIN cannot be a wildcard in production")
+		}
+		if postgresURL.Query().Get("sslmode") == "disable" {
+			return fmt.Errorf("POSTGRES_DSN cannot disable TLS in production")
 		}
 	}
 	return nil
@@ -119,7 +148,7 @@ func optionalInt(name string, fallback int) int {
 	}
 	parsed, err := strconv.Atoi(value)
 	if err != nil {
-		return 0
+		return fallback // ponytail: bad parse → use documented default; Validate() will catch out-of-range values
 	}
 	return parsed
 }

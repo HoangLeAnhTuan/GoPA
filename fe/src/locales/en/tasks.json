@@ -8,6 +8,8 @@
     "placeholder": "What needs your focus?",
     "quickAddPlaceholder": "What do you want to accomplish next? (Press Enter to create)",
     "pomodoro": "Pomodoro:",
+    "priorityLabel": "Task priority",
+    "categoryLabel": "Task category",
     "add": "Add Task",
     "titleRequired": "Please enter a task title",
     "createFailed": "Failed to create task. Please try again."
@@ -26,24 +28,24 @@
     "low": "Low priority",
     "medium": "Medium",
     "high": "High priority",
-    "urgent": "🚨 Urgent"
+    "urgent": "Urgent"
   },
   "priorityOptions": {
     "LOW": "Low priority",
     "MEDIUM": "Medium",
     "HIGH": "High priority",
-    "URGENT": "🚨 Urgent"
+    "URGENT": "Urgent"
   },
   "category": {
     "work": "Work",
     "study": "Study",
     "life": "Life",
-    "leetcode": "💻 LeetCode"
+    "leetcode": "LeetCode"
   },
   "categoryOptions": {
     "WORK": "Work",
     "STUDY": "Study",
-    "LEETCODE": "💻 LeetCode",
+    "LEETCODE": "LeetCode",
     "LIFE": "Life"
   },
   "actions": {

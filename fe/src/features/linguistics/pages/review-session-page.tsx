@@ -8,7 +8,7 @@ import {
   Trophy,
   Volume2,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ButtonInButton } from "../../../components/design-system/button-in-button";
@@ -42,8 +42,10 @@ export function ReviewSessionPage() {
   const [reviewedCount, setReviewedCount] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const typeInputRef = useRef<HTMLInputElement | null>(null);
 
   // Initialize Learning Session on backend
   useEffect(() => {
@@ -53,15 +55,21 @@ export function ReviewSessionPage() {
         if (active) setSessionId(session.id);
       })
       .catch(() => {
-        // Fallback gracefully if session endpoint has transient issue
+        if (active) setActionError(t("reviewSession.syncError"));
       });
     return () => {
       active = false;
     };
-  }, []);
+  }, [t]);
 
   const queue = queueQuery.data ?? [];
   const currentCard: Vocabulary | undefined = queue[currentIndex];
+
+  useEffect(() => {
+    if (studyMode !== "type_in" || !currentCard) return undefined;
+    const focusFrame = window.requestAnimationFrame(() => typeInputRef.current?.focus());
+    return () => window.cancelAnimationFrame(focusFrame);
+  }, [studyMode, currentCard]);
 
   // Distractors for Multiple Choice mode
   const multipleChoiceOptions = useMemo(() => {
@@ -77,7 +85,7 @@ export function ReviewSessionPage() {
   }, [currentCard, allVocabsQuery.data]);
 
   // Audio speech synthesis helper
-  const handlePlayAudio = async () => {
+  const handlePlayAudio = useCallback(async () => {
     if (!currentCard) return;
     setIsPlayingAudio(true);
     try {
@@ -106,16 +114,21 @@ export function ReviewSessionPage() {
     } finally {
       setIsPlayingAudio(false);
     }
-  };
+  }, [currentCard]);
 
-  const handleGrade = async (quality: number) => {
-    if (!currentCard) return;
+  const handleGrade = useCallback(async (quality: number) => {
+    if (!currentCard || reviewMutation.isPending) return;
     const isCorrect = quality >= 3;
-    if (isCorrect) setCorrectCount((prev) => prev + 1);
     const newReviewedCount = reviewedCount + 1;
+    setActionError(null);
+    try {
+      await reviewMutation.mutateAsync({ id: currentCard.id, quality });
+    } catch {
+      setActionError(t("reviewSession.saveError"));
+      return;
+    }
+    if (isCorrect) setCorrectCount((prev) => prev + 1);
     setReviewedCount(newReviewedCount);
-
-    await reviewMutation.mutateAsync({ id: currentCard.id, quality });
 
     // Transition to next card or finish session
     if (currentIndex + 1 < queue.length) {
@@ -128,10 +141,12 @@ export function ReviewSessionPage() {
       setIsFinished(true);
       const durationSeconds = Math.round((Date.now() - sessionStartTime) / 1000);
       if (sessionId) {
-        endLearningSession(sessionId, newReviewedCount, correctCount + (isCorrect ? 1 : 0), durationSeconds).catch(() => {});
+        endLearningSession(sessionId, newReviewedCount, correctCount + (isCorrect ? 1 : 0), durationSeconds).catch(() => {
+          setActionError(t("reviewSession.syncError"));
+        });
       }
     }
-  };
+  }, [currentCard, reviewMutation, reviewedCount, correctCount, currentIndex, queue.length, sessionId, sessionStartTime, t]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -171,11 +186,10 @@ export function ReviewSessionPage() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCard, isFlipped, isFinished, studyMode, isTypeSubmitted]);
+  }, [currentCard, isFlipped, isFinished, studyMode, isTypeSubmitted, handleGrade, handlePlayAudio, navigate]);
 
   if (queueQuery.isPending) return <LoadingState />;
-  if (queueQuery.isError) return <ErrorState />;
+  if (queueQuery.isError) return <ErrorState onRetry={() => void queueQuery.refetch()} />;
 
   if (queue.length === 0 || isFinished || !currentCard) {
     const accuracy = reviewedCount > 0 ? Math.round((correctCount / reviewedCount) * 100) : 100;
@@ -190,6 +204,7 @@ export function ReviewSessionPage() {
           transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
         >
           <DoubleBezelCard className="p-8 text-center">
+            {actionError && <p className="mb-4 rounded-xl bg-rose-500/10 p-3 text-sm text-rose-300" role="alert">{actionError}</p>}
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-500/10 text-violet-500 shadow-inner">
               <Trophy className="h-8 w-8" />
             </div>
@@ -289,6 +304,7 @@ export function ReviewSessionPage() {
           ))}
         </div>
       </div>
+      {actionError && <p className="mx-4 mt-3 rounded-xl bg-rose-500/10 p-3 text-sm text-rose-300" role="alert">{actionError}</p>}
 
       {/* Main Review Canvas */}
       <div className="flex flex-1 flex-col items-center justify-center p-4">
@@ -296,15 +312,10 @@ export function ReviewSessionPage() {
           <AnimatePresence mode="wait">
             <motion.div
               animate={{ rotateY: isFlipped ? 180 : 0, scale: 1, opacity: 1 }}
-              className="relative min-h-[360px] w-full cursor-pointer select-none rounded-[1.75rem]"
+              className="relative min-h-[360px] w-full select-none rounded-[1.75rem]"
               exit={{ opacity: 0, scale: 0.95 }}
               initial={{ scale: 0.95, opacity: 0 }}
               key={currentCard.id}
-              onClick={() => {
-                if (studyMode === "flashcard" || studyMode === "audio_quiz") {
-                  setIsFlipped((prev) => !prev);
-                }
-              }}
               style={{ transformStyle: "preserve-3d" }}
               transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             >
@@ -352,7 +363,7 @@ export function ReviewSessionPage() {
 
                   {/* Multiple Choice interactive buttons */}
                   {studyMode === "multiple_choice" && (
-                    <div className="mt-6 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="mt-6 grid grid-cols-2 gap-2">
                       {multipleChoiceOptions.map((choice, idx) => {
                         const isChosen = selectedChoice === choice;
                         const isCorrect = choice === currentCard.meaning;
@@ -382,9 +393,9 @@ export function ReviewSessionPage() {
 
                   {/* Type-in Answer Input */}
                   {studyMode === "type_in" && (
-                    <div className="mt-6 flex flex-col items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="mt-6 flex flex-col items-center gap-2">
                       <input
-                        autoFocus
+                        aria-label={t("reviewSession.typePlaceholder")}
                         className="h-11 w-full max-w-sm rounded-xl border border-white/20 bg-black/40 px-4 text-center text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
                         onChange={(e) => setTypeInput(e.target.value)}
                         onKeyDown={(e) => {
@@ -394,10 +405,11 @@ export function ReviewSessionPage() {
                           }
                         }}
                         placeholder={t("reviewSession.typePlaceholder")}
+                        ref={typeInputRef}
                         value={typeInput}
                       />
                       <button
-                        className="rounded-lg bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white shadow transition hover:bg-violet-500"
+                        className="min-h-11 rounded-lg bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white shadow transition hover:bg-violet-500"
                         onClick={() => {
                           setIsTypeSubmitted(true);
                           setIsFlipped(true);
@@ -414,9 +426,9 @@ export function ReviewSessionPage() {
                   <span className="flex items-center gap-1">
                     <Keyboard className="h-3 w-3" /> {t("reviewSession.spaceToFlip")}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <RotateCw className="h-3 w-3" /> {t("reviewSession.flipCard")}
-                  </span>
+                  <button className="flex min-h-11 items-center gap-1 rounded-lg px-2 hover:bg-white/10 hover:text-foreground" onClick={() => setIsFlipped((previous) => !previous)} type="button">
+                    <RotateCw aria-hidden="true" className="h-3 w-3" /> {t("reviewSession.flipCard")}
+                  </button>
                 </div>
               </div>
 
@@ -485,7 +497,7 @@ export function ReviewSessionPage() {
           <div className="mt-6 flex flex-col gap-2">
             <div className="grid grid-cols-4 gap-2">
               <button
-                className="flex flex-col items-center justify-center rounded-xl border border-rose-500/20 bg-rose-500/10 py-2.5 transition active:scale-95 hover:bg-rose-500/20 hover:border-rose-500/40"
+                className="flex min-h-11 flex-col items-center justify-center rounded-xl border border-rose-500/20 bg-rose-500/10 py-2.5 transition active:scale-95 hover:bg-rose-500/20 hover:border-rose-500/40"
                 onClick={() => handleGrade(1)}
                 type="button"
               >
@@ -494,7 +506,7 @@ export function ReviewSessionPage() {
               </button>
 
               <button
-                className="flex flex-col items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 py-2.5 transition active:scale-95 hover:bg-amber-500/20 hover:border-amber-500/40"
+                className="flex min-h-11 flex-col items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 py-2.5 transition active:scale-95 hover:bg-amber-500/20 hover:border-amber-500/40"
                 onClick={() => handleGrade(2)}
                 type="button"
               >
@@ -503,7 +515,7 @@ export function ReviewSessionPage() {
               </button>
 
               <button
-                className="flex flex-col items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 py-2.5 transition active:scale-95 hover:bg-emerald-500/20 hover:border-emerald-500/40"
+                className="flex min-h-11 flex-col items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 py-2.5 transition active:scale-95 hover:bg-emerald-500/20 hover:border-emerald-500/40"
                 onClick={() => handleGrade(4)}
                 type="button"
               >
@@ -512,7 +524,7 @@ export function ReviewSessionPage() {
               </button>
 
               <button
-                className="flex flex-col items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 py-2.5 transition active:scale-95 hover:bg-blue-500/20 hover:border-blue-500/40"
+                className="flex min-h-11 flex-col items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 py-2.5 transition active:scale-95 hover:bg-blue-500/20 hover:border-blue-500/40"
                 onClick={() => handleGrade(5)}
                 type="button"
               >

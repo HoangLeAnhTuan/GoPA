@@ -26,22 +26,22 @@ const variantStyles: Record<ButtonVariant, string> = {
 
 // Padding when an icon is on the right
 const sizeStylesRightIcon = {
-  sm: "pl-4 pr-1.5 py-1.5 text-xs min-h-[36px]",
-  md: "pl-5 pr-2 py-2 text-sm min-h-[42px]",
+  sm: "pl-4 pr-1.5 py-1.5 text-xs min-h-11",
+  md: "pl-5 pr-2 py-2 text-sm min-h-11",
   lg: "pl-6 pr-2.5 py-2.5 text-base min-h-[48px]",
 };
 
 // Padding when an icon is on the left
 const sizeStylesLeftIcon = {
-  sm: "pl-1.5 pr-4 py-1.5 text-xs min-h-[36px] flex-row-reverse",
-  md: "pl-2 pr-5 py-2 text-sm min-h-[42px] flex-row-reverse",
+  sm: "pl-1.5 pr-4 py-1.5 text-xs min-h-11 flex-row-reverse",
+  md: "pl-2 pr-5 py-2 text-sm min-h-11 flex-row-reverse",
   lg: "pl-2.5 pr-6 py-2.5 text-base min-h-[48px] flex-row-reverse",
 };
 
 // Padding when there is no icon
 const sizeStylesNoIcon = {
-  sm: "px-4 py-1.5 text-xs min-h-[36px]",
-  md: "px-5 py-2 text-sm min-h-[42px]",
+  sm: "px-4 py-1.5 text-xs min-h-11",
+  md: "px-5 py-2 text-sm min-h-11",
   lg: "px-6 py-2.5 text-base min-h-[48px]",
 };
 

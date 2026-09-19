@@ -8,6 +8,8 @@
     "placeholder": "何に集中しますか？",
     "quickAddPlaceholder": "次に完了したいタスクは何ですか？ (Enterで即時作成)",
     "pomodoro": "ポモドーロ:",
+    "priorityLabel": "タスクの優先度",
+    "categoryLabel": "タスクのカテゴリ",
     "add": "タスク追加",
     "titleRequired": "タスクのタイトルを入力してください",
     "createFailed": "タスクの作成に失敗しました。もう一度お試しください。"
@@ -26,24 +28,24 @@
     "low": "優先度：低",
     "medium": "優先度：中",
     "high": "優先度：高",
-    "urgent": "🚨 緊急"
+    "urgent": "緊急"
   },
   "priorityOptions": {
     "LOW": "優先度：低",
     "MEDIUM": "普通",
     "HIGH": "優先度：高",
-    "URGENT": "🚨 緊急"
+    "URGENT": "緊急"
   },
   "category": {
     "work": "仕事",
     "study": "学習",
     "life": "生活",
-    "leetcode": "💻 LeetCode"
+    "leetcode": "LeetCode"
   },
   "categoryOptions": {
     "WORK": "仕事 (Work)",
     "STUDY": "学習 (Study)",
-    "LEETCODE": "💻 LeetCode",
+    "LEETCODE": "LeetCode",
     "LIFE": "生活 (Life)"
   },
   "actions": {

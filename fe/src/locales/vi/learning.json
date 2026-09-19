@@ -94,7 +94,9 @@
     "rating4": "4 · Dễ",
     "rating4Interval": "14 ngày",
     "shortcuts": "Phím tắt: 1-4 để chấm điểm",
-    "shortcutsExtra": "Space để lật · Esc để thoát"
+    "shortcutsExtra": "Space để lật · Esc để thoát",
+    "saveError": "Không thể lưu lượt ôn tập. Hãy kiểm tra kết nối và thử lại.",
+    "syncError": "Tạm thời không thể theo dõi phiên. Bạn vẫn có thể tiếp tục ôn tập."
   },
   "manage": {
     "title": "Bộ sưu tập từ vựng",

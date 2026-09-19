@@ -30,6 +30,12 @@ func TestHealthHandler_LivenessDoesNotRequireDependencies(t *testing.T) {
 	if response.Code != http.StatusOK {
 		t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
 	}
+	if got := response.Header().Get("X-Content-Type-Options"); got != "nosniff" {
+		t.Fatalf("expected nosniff security header, got %q", got)
+	}
+	if got := response.Header().Get("Content-Security-Policy"); got == "" {
+		t.Fatal("expected content security policy header")
+	}
 }
 
 func TestHealthHandler_ReadinessReturnsServiceUnavailableWhenDependencyFails(t *testing.T) {
@@ -41,6 +47,9 @@ func TestHealthHandler_ReadinessReturnsServiceUnavailableWhenDependencyFails(t *
 
 	if response.Code != http.StatusServiceUnavailable {
 		t.Fatalf("expected status %d, got %d", http.StatusServiceUnavailable, response.Code)
+	}
+	if got := response.Header().Get("X-Request-ID"); got == "" {
+		t.Fatal("expected request ID header on readiness failure")
 	}
 }
 

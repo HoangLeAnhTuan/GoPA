@@ -10,7 +10,7 @@ import {
   Wallet,
   X,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AmountDisplay } from "../../../components/design-system/amount-display";
@@ -44,6 +44,7 @@ export function GoalsPage() {
   // Deposit progress dialog
   const [depositGoal, setDepositGoal] = useState<SavingsGoal | null>(null);
   const [depositAmount, setDepositAmount] = useState("");
+  const depositInputRef = useRef<HTMLInputElement>(null);
 
   // Form states
   const [formName, setFormName] = useState("");
@@ -54,8 +55,22 @@ export function GoalsPage() {
   const [formColor, setFormColor] = useState("#8b5cf6");
   const [formIcon, setFormIcon] = useState("target");
 
+  useEffect(() => {
+    if (!depositGoal) return undefined;
+    const focusFrame = window.requestAnimationFrame(() => depositInputRef.current?.focus());
+    return () => window.cancelAnimationFrame(focusFrame);
+  }, [depositGoal]);
+
   if (goalsQuery.isPending || accountsQuery.isPending) return <LoadingState />;
-  if (goalsQuery.isError || accountsQuery.isError) return <ErrorState />;
+  if (goalsQuery.isError || accountsQuery.isError)
+    return (
+      <ErrorState
+        onRetry={() => {
+          void goalsQuery.refetch();
+          void accountsQuery.refetch();
+        }}
+      />
+    );
 
   const goals = goalsQuery.data ?? [];
   const accounts = accountsQuery.data ?? [];
@@ -208,7 +223,7 @@ export function GoalsPage() {
                 <div className="flex items-center gap-1">
                   <button
                     aria-label="Edit goal"
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
+                    className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
                     onClick={() => openEditModal(goal)}
                     type="button"
                   >
@@ -216,7 +231,7 @@ export function GoalsPage() {
                   </button>
                   <button
                     aria-label="Delete goal"
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-muted-foreground transition hover:bg-rose-500/20 hover:text-rose-400"
+                    className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition hover:bg-rose-500/20 hover:text-rose-400"
                     onClick={() => {
                       if (confirm(t("goals.deleteConfirm", { name: goal.name }))) {
                         deleteMutation.mutate(goal.id);
@@ -302,16 +317,16 @@ export function GoalsPage() {
       {/* QUICK DEPOSIT DIALOG */}
       {depositGoal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm">
+          <div aria-labelledby="deposit-dialog-title" aria-modal="true" className="w-full max-w-sm" role="dialog">
             <DoubleBezelCard className="p-6">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div>
-                  <h3 className="text-base font-bold">{t("goals.depositModalTitle")}</h3>
+                  <h3 className="text-base font-bold" id="deposit-dialog-title">{t("goals.depositModalTitle")}</h3>
                   <p className="text-xs text-muted-foreground">{depositGoal.name}</p>
                 </div>
                 <button
-                  aria-label="Close modal"
-                  className="rounded-lg p-1 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                  aria-label={t("goals.cancel")}
+                  className="icon-button"
                   onClick={() => setDepositGoal(null)}
                   type="button"
                 >
@@ -321,13 +336,14 @@ export function GoalsPage() {
 
               <form className="mt-4 space-y-3" onSubmit={handleDepositSubmit}>
                 <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground">{t("goals.depositAmountLabel")}</label>
+                  <label className="text-[11px] font-semibold text-muted-foreground" htmlFor="goal-deposit-amount">{t("goals.depositAmountLabel")}</label>
                   <input
-                    autoFocus
-                    className="mt-1 h-9 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs font-mono outline-none focus:border-violet-500"
+                    className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs font-mono outline-none focus:border-violet-500"
+                    id="goal-deposit-amount"
                     onChange={(e) => setDepositAmount(e.target.value)}
                     placeholder={t("goals.depositAmountPlaceholder")}
                     required
+                    ref={depositInputRef}
                     type="number"
                     value={depositAmount}
                   />
@@ -371,15 +387,15 @@ export function GoalsPage() {
       {/* CREATE / EDIT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md">
+          <div aria-labelledby="goal-form-dialog-title" aria-modal="true" className="w-full max-w-md" role="dialog">
             <DoubleBezelCard className="p-6">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <h2 className="text-base font-bold">
+                <h2 className="text-base font-bold" id="goal-form-dialog-title">
                   {editingGoal ? t("goals.editModalTitle") : t("goals.createModalTitle")}
                 </h2>
                 <button
-                  aria-label="Close modal"
-                  className="rounded-lg p-1 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                  aria-label={t("goals.cancel")}
+                  className="icon-button"
                   onClick={() => setIsModalOpen(false)}
                   type="button"
                 >
@@ -389,9 +405,10 @@ export function GoalsPage() {
 
               <form className="mt-4 space-y-3" onSubmit={handleSave}>
                 <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground">{t("goals.nameLabel")}</label>
+                  <label className="text-[11px] font-semibold text-muted-foreground" htmlFor="goal-name">{t("goals.nameLabel")}</label>
                   <input
-                    className="mt-1 h-9 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs outline-none focus:border-violet-500"
+                    className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs outline-none focus:border-violet-500"
+                    id="goal-name"
                     onChange={(e) => setFormName(e.target.value)}
                     placeholder={t("goals.namePlaceholder")}
                     required
@@ -401,9 +418,10 @@ export function GoalsPage() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[11px] font-semibold text-muted-foreground">{t("goals.targetAmountLabel")}</label>
+                    <label className="text-[11px] font-semibold text-muted-foreground" htmlFor="goal-target-amount">{t("goals.targetAmountLabel")}</label>
                     <input
-                      className="mt-1 h-9 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs font-mono outline-none focus:border-violet-500"
+                      className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs font-mono outline-none focus:border-violet-500"
+                      id="goal-target-amount"
                       onChange={(e) => setFormTarget(e.target.value)}
                       placeholder={t("goals.targetAmountPlaceholder")}
                       required
@@ -413,9 +431,10 @@ export function GoalsPage() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-muted-foreground">{t("goals.currentAmountLabel")}</label>
+                    <label className="text-[11px] font-semibold text-muted-foreground" htmlFor="goal-current-amount">{t("goals.currentAmountLabel")}</label>
                     <input
-                      className="mt-1 h-9 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs font-mono outline-none focus:border-violet-500"
+                      className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs font-mono outline-none focus:border-violet-500"
+                      id="goal-current-amount"
                       onChange={(e) => setFormCurrent(e.target.value)}
                       placeholder={t("goals.currentAmountPlaceholder")}
                       type="number"
@@ -426,9 +445,10 @@ export function GoalsPage() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[11px] font-semibold text-muted-foreground">{t("goals.linkedAccountLabel")}</label>
+                    <label className="text-[11px] font-semibold text-muted-foreground" htmlFor="goal-linked-account">{t("goals.linkedAccountLabel")}</label>
                     <select
-                      className="mt-1 h-9 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs outline-none focus:border-violet-500"
+                      className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs outline-none focus:border-violet-500"
+                      id="goal-linked-account"
                       onChange={(e) => setFormAccountId(e.target.value)}
                       value={formAccountId}
                     >
@@ -442,9 +462,10 @@ export function GoalsPage() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-muted-foreground">{t("goals.targetDateLabel")}</label>
+                    <label className="text-[11px] font-semibold text-muted-foreground" htmlFor="goal-target-date">{t("goals.targetDateLabel")}</label>
                     <input
-                      className="mt-1 h-9 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs outline-none focus:border-violet-500"
+                      className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-xs outline-none focus:border-violet-500"
+                      id="goal-target-date"
                       onChange={(e) => setFormDate(e.target.value)}
                       type="date"
                       value={formDate}
@@ -457,7 +478,9 @@ export function GoalsPage() {
                   <div className="mt-1.5 flex items-center gap-2">
                     {["#8b5cf6", "#10b981", "#3b82f6", "#f59e0b", "#ec4899", "#06b6d4"].map((c) => (
                       <button
-                        className={`h-6 w-6 rounded-full transition ${formColor === c ? "ring-2 ring-white ring-offset-2 ring-offset-black scale-110" : ""}`}
+                        aria-label={`${t("goals.colorThemeLabel")} ${c}`}
+                        aria-pressed={formColor === c}
+                        className={`h-11 w-11 rounded-full border-[10px] border-transparent bg-clip-padding transition ${formColor === c ? "ring-2 ring-white ring-offset-2 ring-offset-black scale-110" : ""}`}
                         key={c}
                         onClick={() => setFormColor(c)}
                         style={{ backgroundColor: c }}

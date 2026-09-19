@@ -1,5 +1,5 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
-import { apiClient, toApiError } from "../../../lib/api-client";
+import { API_BASE_URL, apiClient, toApiError } from "../../../lib/api-client";
 import type { AuthDto, AuthResult, LoginInput, RegisterInput, UpdateProfileInput, User, UserDto } from "../types";
 
 interface Envelope<T> {
@@ -11,7 +11,7 @@ let accessToken: string | null = null;
 let refreshPromise: Promise<string> | null = null;
 
 const refreshClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api/v1",
+  baseURL: API_BASE_URL,
   timeout: 10_000,
   withCredentials: true,
 });

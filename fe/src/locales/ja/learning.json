@@ -94,7 +94,9 @@
     "rating4": "4 · 簡単",
     "rating4Interval": "14日",
     "shortcuts": "ショートカット: 1-4 で評価",
-    "shortcutsExtra": "Space で裏返し · Esc で終了"
+    "shortcutsExtra": "Space で裏返し · Esc で終了",
+    "saveError": "復習を保存できませんでした。接続を確認して、もう一度お試しください。",
+    "syncError": "セッション追跡は一時的に利用できません。復習は続けられます。"
   },
   "manage": {
     "title": "語彙コレクション",
