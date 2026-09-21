@@ -94,10 +94,21 @@ data/
 *.sqlite3
 
 # Claude Code Agent Files
-# Keep: .agents/rules/ and .agents/personas/ (project-specific config)
+# Keep: .agents/rules/ and .agents/personas/ (project-specific AI config)
 # Ignore: bundled skills and references (managed by Claude Code, not the project)
 .agents/skills/
 .agents/references/
+
+# Claude Code runtime & session files
+.claude/
+
+# Claude Code skill manager lock file (internal tooling, not a project artifact)
+skills-lock.json
+
+# AI agent operational guides (internal development tooling, not user-facing docs)
+# Keep: MASTER_PROMPT.md, README.md, CHANGELOG.md, be/BACKEND_MASTER.md, fe/FRONTEND_MASTER.md
+AGENTS.md
+EXECUTION_ROADMAP.md
 
 # IDE & Editor Files
 .idea/
