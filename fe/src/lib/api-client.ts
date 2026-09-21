@@ -1,6 +1,14 @@
 import axios, { AxiosError } from "axios";
 import { DEFAULT_API_TIMEOUT } from "../constants/constants";
 
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+
+if (import.meta.env.PROD && !configuredApiBaseUrl) {
+  throw new Error("VITE_API_BASE_URL is required for production builds.");
+}
+
+export const API_BASE_URL = (configuredApiBaseUrl || "http://localhost:8081/api/v1").replace(/\/+$/, "");
+
 export interface ApiError {
   code: string;
   message: string;
@@ -15,7 +23,7 @@ interface ErrorEnvelope {
 }
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api/v1",
+  baseURL: API_BASE_URL,
   timeout: DEFAULT_API_TIMEOUT,
   withCredentials: true,
 });

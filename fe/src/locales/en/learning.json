@@ -94,7 +94,9 @@
     "rating4": "4 · Easy",
     "rating4Interval": "14 days",
     "shortcuts": "Shortcuts: 1-4 to rate",
-    "shortcutsExtra": "Space to flip · Esc to exit"
+    "shortcutsExtra": "Space to flip · Esc to exit",
+    "saveError": "We couldn't save this review. Check your connection and try again.",
+    "syncError": "Session tracking is temporarily unavailable. You can continue reviewing."
   },
   "manage": {
     "title": "Vocabulary Collection",

@@ -34,12 +34,7 @@ func (h *HealthHandler) ready(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 3*time.Second)
 	defer cancel()
 	if err := h.readiness.Check(ctx); err != nil {
-		c.JSON(http.StatusServiceUnavailable, response.Envelope{
-			Error: &response.Err{
-				Code:    "NOT_READY",
-				Message: "Required dependencies are unavailable.",
-			},
-		})
+		response.FailWithStatus(c, http.StatusServiceUnavailable, "NOT_READY", "Required dependencies are unavailable.")
 		return
 	}
 	response.OK(c, gin.H{"status": "ready"})

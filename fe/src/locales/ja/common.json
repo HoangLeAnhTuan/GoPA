@@ -13,6 +13,9 @@
     "theme": "カラーテーマを切り替える",
     "toggleSidebar": "サイドバーを切り替える",
     "openNavigation": "ナビゲーションを開く",
+    "closeNavigation": "ナビゲーションを閉じる",
+    "closeDialog": "ダイアログを閉じる",
+    "skipToContent": "メインコンテンツへ移動",
     "search": "検索...",
     "searchAria": "GoPA内を検索 (Ctrl K)"
   },

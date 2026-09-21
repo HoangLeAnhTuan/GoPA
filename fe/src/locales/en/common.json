@@ -13,6 +13,9 @@
     "theme": "Toggle color theme",
     "toggleSidebar": "Toggle sidebar",
     "openNavigation": "Open navigation",
+    "closeNavigation": "Close navigation",
+    "closeDialog": "Close dialog",
+    "skipToContent": "Skip to main content",
     "search": "Search...",
     "searchAria": "Search GoPA (Ctrl K)"
   },

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { getAccessToken } from "../../auth/api/auth-api";
+import { API_BASE_URL } from "../../../lib/api-client";
 import { listPomodoroHistory, type PomodoroState, type PomodoroHistoryItem } from "../api/pomodoro-api";
 
 export type WebSocketConnectionStatus = "connected" | "connecting" | "disconnected";
@@ -22,8 +23,7 @@ export function usePomodoroWs() {
         return;
       }
 
-      const apiBase = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api/v1";
-      const wsBase = apiBase.replace(/^http/, "ws");
+      const wsBase = API_BASE_URL.replace(/^http/, "ws");
       const wsUrl = `${wsBase}/ws/pomodoro?token=${encodeURIComponent(token)}`;
 
       setStatus("connecting");

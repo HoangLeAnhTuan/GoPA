@@ -14,6 +14,7 @@ import {
   Sparkles,
   Timer,
   WalletCards,
+  X,
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -45,6 +46,8 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   // Live queries for tasks, vocabularies, journals
   const tasksQ = useTasks();
@@ -53,10 +56,16 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
   useEffect(() => {
     if (isOpen) {
+      previouslyFocusedRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       setQuery("");
       setSelectedIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
+      const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 50);
+      return () => {
+        window.clearTimeout(focusTimer);
+        previouslyFocusedRef.current?.focus();
+      };
     }
+    return undefined;
   }, [isOpen]);
 
   const navigationCommands: CommandItem[] = useMemo(
@@ -268,6 +277,21 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();
+      } else if (e.key === "Tab" && dialogRef.current) {
+        const focusable = Array.from(
+          dialogRef.current.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+          )
+        );
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (first && last && e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (first && last && !e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
         setSelectedIndex((prev) => (prev + 1) % Math.max(1, filteredCommands.length));
@@ -289,16 +313,20 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/65 p-4 pt-[12vh] backdrop-blur-md"
-      onClick={onClose}
-    >
-      <div className="w-full max-w-xl" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-[12vh]">
+      <button aria-label={t("controls.closeDialog")} className="absolute inset-0 cursor-default bg-black/65 backdrop-blur-md" onClick={onClose} type="button" />
+      <div aria-labelledby="command-palette-title" aria-modal="true" className="relative w-full max-w-xl" ref={dialogRef} role="dialog">
+        <h2 className="sr-only" id="command-palette-title">{t("controls.searchAria")}</h2>
         <DoubleBezelCard className="overflow-hidden p-0 shadow-2xl">
           {/* Search Input Bar */}
           <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
-            <Search className="h-5 w-5 text-muted-foreground" />
+            <Search aria-hidden="true" className="h-5 w-5 text-muted-foreground" />
             <input
+              aria-activedescendant={filteredCommands[selectedIndex] ? `command-option-${filteredCommands[selectedIndex].id}` : undefined}
+              aria-controls="command-palette-results"
+              aria-expanded="true"
+              aria-label={t("controls.searchAria")}
+              aria-haspopup="listbox"
               className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -306,17 +334,16 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
               }}
               placeholder={t("commandPalette.placeholder")}
               ref={inputRef}
+              role="combobox"
               value={query}
             />
-            <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-              Esc
-            </kbd>
+            <button aria-label={t("controls.closeDialog")} className="icon-button" onClick={onClose} type="button"><X aria-hidden="true" className="size-4" /></button>
           </div>
 
           {/* Results List */}
-          <div className="max-h-[380px] overflow-y-auto p-2 scrollbar-thin">
+          <div className="max-h-[380px] overflow-y-auto p-2 scrollbar-thin" id="command-palette-results" role="listbox">
             {filteredCommands.length === 0 ? (
-              <div className="py-12 text-center text-xs text-muted-foreground">
+              <div className="py-12 text-center text-xs text-muted-foreground" role="status">
                 {t("commandPalette.noResults", { query })}
               </div>
             ) : (
@@ -326,13 +353,18 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                 const categoryLabel = t(`commandPalette.categories.${item.categoryKey}`);
 
                 return (
-                  <div
-                    className={`flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 transition ${
+                  <button
+                    aria-selected={isSelected}
+                    className={`flex min-h-11 w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-left transition ${
                       isSelected ? "bg-violet-600 text-white shadow" : "text-foreground hover:bg-white/5"
                     }`}
+                    id={`command-option-${item.id}`}
                     key={item.id}
                     onClick={item.onSelect}
                     onMouseEnter={() => setSelectedIndex(idx)}
+                    role="option"
+                    tabIndex={-1}
+                    type="button"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div
@@ -340,7 +372,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                           isSelected ? "bg-white/20 text-white" : "bg-white/5 text-muted-foreground"
                         }`}
                       >
-                        <Icon className="h-4 w-4" />
+                        <Icon aria-hidden="true" className="h-4 w-4" />
                       </div>
                       <div className="truncate">
                         <p className="text-xs font-semibold truncate">{item.title}</p>
@@ -364,9 +396,9 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                       >
                         {categoryLabel}
                       </span>
-                      {isSelected && <ArrowRight className="h-3.5 w-3.5" />}
+                      {isSelected && <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" />}
                     </div>
-                  </div>
+                  </button>
                 );
               })
             )}

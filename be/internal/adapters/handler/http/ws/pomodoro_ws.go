@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
@@ -14,6 +13,7 @@ import (
 	"gopa/internal/adapters/cache"
 	"gopa/internal/core/domain"
 	"gopa/internal/services"
+	"gopa/pkg/constants"
 )
 
 type WSMessage struct {
@@ -56,21 +56,15 @@ func NewPomodoroWSGateway(
 
 func (g *PomodoroWSGateway) checkOrigin(r *http.Request) bool {
 	origin := r.Header.Get("Origin")
+	if g.webOrigin == "*" {
+		return true
+	}
 	if origin == "" {
-		return true
-	}
-	if g.webOrigin == "" || g.webOrigin == "*" {
-		return true
-	}
-	if strings.EqualFold(origin, g.webOrigin) {
-		return true
-	}
-	u, err := url.Parse(origin)
-	if err != nil {
+		// Require an Origin header in non-wildcard mode; empty origin means a non-browser
+		// client that bypasses origin checking entirely.
 		return false
 	}
-	originHost := u.Hostname()
-	return originHost == "localhost" || originHost == "127.0.0.1"
+	return g.webOrigin != "" && strings.EqualFold(origin, g.webOrigin)
 }
 
 func (g *PomodoroWSGateway) RegisterRoutes(api *gin.RouterGroup, authenticate gin.HandlerFunc) {
@@ -78,10 +72,28 @@ func (g *PomodoroWSGateway) RegisterRoutes(api *gin.RouterGroup, authenticate gi
 }
 
 func (g *PomodoroWSGateway) HandleConnection(c *gin.Context) {
+	val, exists := c.Get(constants.IdentityKey)
+	if !exists {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	// Identity is set by Authenticate middleware in the http package.
+	// We use a local mirror struct to avoid a circular import.
+	type identity struct{ UserID uuid.UUID }
+	raw, ok := val.(interface{ GetUserID() uuid.UUID })
 	var userID uuid.UUID
-	if val, exists := c.Get("user_id"); exists {
-		if id, ok := val.(uuid.UUID); ok {
-			userID = id
+	if ok {
+		userID = raw.GetUserID()
+	} else {
+		// Fallback: the value stored is the concrete Identity struct from the http package;
+		// extract via JSON round-trip to avoid the cross-package import.
+		if b, err := json.Marshal(val); err == nil {
+			var tmp struct {
+				UserID string `json:"UserID"`
+			}
+			if json.Unmarshal(b, &tmp) == nil {
+				userID, _ = uuid.Parse(tmp.UserID)
+			}
 		}
 	}
 	if userID == uuid.Nil {
@@ -183,11 +195,10 @@ func (g *PomodoroWSGateway) HandleConnection(c *gin.Context) {
 			}
 
 		case <-ticker.C:
+			// Send a real WebSocket ping so the pong handler resets the read deadline.
+			// A JSON "heartbeat" message is not a protocol-level keep-alive.
 			_ = conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
-			if writeErr := conn.WriteJSON(WSMessage{
-				Type:      "heartbeat",
-				Timestamp: time.Now().UTC().Format(time.RFC3339),
-			}); writeErr != nil {
+			if writeErr := conn.WriteMessage(websocket.PingMessage, nil); writeErr != nil {
 				return
 			}
 		}

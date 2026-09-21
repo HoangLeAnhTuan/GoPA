@@ -28,11 +28,13 @@ func Authenticate(tokens *utils.TokenManager) gin.HandlerFunc {
 				tokenStr = strings.TrimSpace(parts[1])
 			}
 		}
-		if tokenStr == "" {
-			tokenStr = strings.TrimSpace(c.Query("token"))
-		}
-		if tokenStr == "" {
-			tokenStr = strings.TrimSpace(c.Query("access_token"))
+		if tokenStr == "" && c.Request.URL.Path == "/api/v1/ws/pomodoro" {
+			// WebSocket clients cannot send Authorization headers; fall back to query param.
+			if t := strings.TrimSpace(c.Query("token")); t != "" {
+				tokenStr = t
+			} else {
+				tokenStr = strings.TrimSpace(c.Query("access_token"))
+			}
 		}
 		if tokenStr == "" {
 			response.Fail(c, domain.ErrUnauthorized)
@@ -52,7 +54,6 @@ func Authenticate(tokens *utils.TokenManager) gin.HandlerFunc {
 			return
 		}
 		c.Set(constants.IdentityKey, Identity{UserID: userID})
-		c.Set("user_id", userID)
 		c.Next()
 	}
 }
@@ -60,13 +61,13 @@ func Authenticate(tokens *utils.TokenManager) gin.HandlerFunc {
 func rateLimit(limiter ports.RateLimiter, operation string, limit int, window time.Duration) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		allowed, err := limiter.Allow(c.Request.Context(), operation+":"+c.ClientIP(), limit, window)
-		if err != nil || !allowed {
-			c.JSON(http.StatusTooManyRequests, response.Envelope{
-				Error: &response.Err{
-					Code:    "RATE_LIMITED",
-					Message: "Too many requests. Please try again later.",
-				},
-			})
+		if err != nil {
+			response.FailWithStatus(c, http.StatusServiceUnavailable, "RATE_LIMIT_UNAVAILABLE", "Authentication is temporarily unavailable. Please try again later.")
+			c.Abort()
+			return
+		}
+		if !allowed {
+			response.FailWithStatus(c, http.StatusTooManyRequests, "RATE_LIMITED", "Too many requests. Please try again later.")
 			c.Abort()
 			return
 		}

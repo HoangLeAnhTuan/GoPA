@@ -1,5 +1,5 @@
 import { ChevronLeft, Languages, LayoutDashboard, ListTodo, Menu, NotebookPen, Search, Settings, Timer, WalletCards, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { CommandPalette } from "../components/design-system/command-palette";
@@ -47,8 +47,8 @@ function Sidebar({ collapsed = false, onClose, onToggleCollapse }: SidebarProps)
             <ChevronLeft className={cn("transition-transform duration-200", compact && "rotate-180")} size={18} />
           </button>
         ) : (
-          <button aria-label={t("controls.openNavigation")} className="icon-button sm:hidden" onClick={onClose} type="button">
-            <X size={18} />
+          <button aria-label={t("controls.closeNavigation")} className="icon-button sm:hidden" onClick={onClose} type="button">
+            <X aria-hidden="true" size={18} />
           </button>
         )}
       </div>
@@ -76,8 +76,18 @@ export function AppLayout() {
   const toggleSidebar = useUIPreferencesStore((state) => state.toggleSidebar);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+  const mobileNavigationRef = useRef<HTMLElement>(null);
 
-  useEffect(() => setMobileOpen(false), [location.pathname]);
+  useEffect(() => {
+    setMobileOpen(false);
+    mainRef.current?.focus();
+  }, [location.pathname]);
+  useEffect(() => {
+    if (mobileNavigationRef.current) {
+      mobileNavigationRef.current.inert = !mobileOpen;
+    }
+  }, [mobileOpen]);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMobileOpen(false);
@@ -92,6 +102,9 @@ export function AppLayout() {
 
   return (
     <div className="relative h-dvh overflow-hidden bg-background text-foreground transition-colors duration-300">
+      <a className="sr-only fixed left-4 top-4 z-50 rounded-xl bg-primary px-4 py-3 font-semibold text-primary-foreground focus:not-sr-only" href="#main-content">
+        {t("controls.skipToContent")}
+      </a>
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20" style={{ backgroundImage: "radial-gradient(circle, rgba(148,163,184,0.13) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
       <div className={cn("pointer-events-none fixed inset-0 -z-10 transition-all duration-700", ambientGradient(location.pathname))} />
 
@@ -100,7 +113,7 @@ export function AppLayout() {
       </aside>
 
       <button aria-label={t("controls.openNavigation")} className={cn("fixed inset-0 z-30 bg-slate-950/40 transition-opacity sm:hidden", mobileOpen ? "opacity-100" : "pointer-events-none opacity-0")} onClick={() => setMobileOpen(false)} type="button" />
-      <aside aria-hidden={!mobileOpen} className={cn("fixed inset-y-3 left-3 z-40 flex w-[min(20rem,calc(100vw-1.5rem))] flex-col rounded-3xl border border-white/60 bg-white/95 p-3 shadow-2xl shadow-slate-950/25 backdrop-blur-2xl transition-transform duration-300 dark:border-white/10 dark:bg-slate-950/95 sm:hidden", mobileOpen ? "translate-x-0" : "-translate-x-[calc(100%+1.5rem)]")}>
+      <aside aria-hidden={!mobileOpen} aria-label={t("navigation.label")} className={cn("fixed inset-y-3 left-3 z-40 flex w-[min(20rem,calc(100vw-1.5rem))] flex-col rounded-3xl border border-white/60 bg-white/95 p-3 shadow-2xl shadow-slate-950/25 backdrop-blur-2xl transition-transform duration-300 dark:border-white/10 dark:bg-slate-950/95 sm:hidden", mobileOpen ? "translate-x-0" : "-translate-x-[calc(100%+1.5rem)]")} ref={mobileNavigationRef}>
         <Sidebar onClose={() => setMobileOpen(false)} />
       </aside>
 
@@ -111,11 +124,11 @@ export function AppLayout() {
             <p className="truncate text-sm font-bold tracking-tight">GoPA</p>
             <button
               aria-label={t("controls.searchAria")}
-              className="ml-2 flex items-center gap-2 rounded-xl border border-white/40 bg-white/50 px-2.5 py-1 text-xs text-muted-foreground transition hover:bg-white/80 hover:text-foreground dark:border-white/10 dark:bg-slate-900/60"
+              className="ml-2 flex min-h-11 items-center gap-2 rounded-xl border border-white/40 bg-white/50 px-2.5 py-1 text-xs text-muted-foreground transition hover:bg-white/80 hover:text-foreground dark:border-white/10 dark:bg-slate-900/60"
               onClick={() => setCommandPaletteOpen(true)}
               type="button"
             >
-              <Search size={13} />
+              <Search aria-hidden="true" size={13} />
               <span className="hidden sm:inline">{t("controls.search")}</span>
               <kbd className="rounded border border-white/20 bg-white/40 px-1 py-0.2 font-mono text-[10px] dark:bg-white/10">
                 Ctrl K
@@ -124,7 +137,7 @@ export function AppLayout() {
           </div>
           <div className="flex shrink-0 items-center gap-1 sm:gap-3"><LanguageSwitcher /><ThemeSwitcher /></div>
         </header>
-        <main className="flex-1 min-h-0 flex flex-col overflow-hidden px-3 pb-3 pt-3 sm:px-4 sm:pb-4 sm:pt-3">
+        <main className="flex-1 min-h-0 flex flex-col overflow-hidden px-3 pb-3 pt-3 focus:outline-none sm:px-4 sm:pb-4 sm:pt-3" id="main-content" ref={mainRef} tabIndex={-1}>
           <div className="h-full w-full mx-auto max-w-[1600px] flex flex-col min-h-0 overflow-hidden">
             <Outlet />
           </div>

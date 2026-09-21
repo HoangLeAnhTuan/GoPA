@@ -64,10 +64,20 @@ func Paginated(c *gin.Context, data any, cursor string, total *int) {
 // Fail maps known domain errors to appropriate HTTP status codes and API error envelopes.
 func Fail(c *gin.Context, err error) {
 	status, code, message := mapDomainError(err)
+	writeError(c, status, code, message, nil)
+}
+
+// FailWithStatus writes an explicit operational error while preserving the standard envelope.
+func FailWithStatus(c *gin.Context, status int, code, message string) {
+	writeError(c, status, code, message, nil)
+}
+
+func writeError(c *gin.Context, status int, code, message string, details []ErrDetail) {
 	c.JSON(status, Envelope{
 		Error: &Err{
 			Code:    code,
 			Message: message,
+			Details: details,
 		},
 		Meta: getMeta(c, "", nil),
 	})
@@ -75,14 +85,7 @@ func Fail(c *gin.Context, err error) {
 
 // FailWithDetails writes a validation failure response with granular field errors.
 func FailWithDetails(c *gin.Context, message string, details []ErrDetail) {
-	c.JSON(http.StatusBadRequest, Envelope{
-		Error: &Err{
-			Code:    "VALIDATION_ERROR",
-			Message: message,
-			Details: details,
-		},
-		Meta: getMeta(c, "", nil),
-	})
+	writeError(c, http.StatusBadRequest, "VALIDATION_ERROR", message, details)
 }
 
 func mapDomainError(err error) (int, string, string) {
@@ -98,7 +101,7 @@ func mapDomainError(err error) (int, string, string) {
 	case errors.Is(err, domain.ErrConflict):
 		return http.StatusConflict, "CONFLICT", "A record with this value already exists."
 	case errors.Is(err, domain.ErrBadGateway):
-		return http.StatusBadGateway, "SERVICE_UNAVAILABLE", "An upstream dependency failed to process the request."
+		return http.StatusBadGateway, "BAD_GATEWAY", "An upstream dependency failed to process the request."
 	default:
 		return http.StatusInternalServerError, "INTERNAL_ERROR", "An unexpected error occurred."
 	}

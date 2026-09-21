@@ -374,6 +374,54 @@ func TestAuthHandler_UpdateProfile(t *testing.T) {
 	}
 }
 
+func TestAuthenticate_RejectsQueryTokenOnRESTEndpoint(t *testing.T) {
+	router, tokenMgr, user := setupTestServer()
+	token := authHeader(t, tokenMgr, user)
+	request := httptest.NewRequest(http.MethodGet, "/api/v1/tasks", nil)
+	query := request.URL.Query()
+	query.Set("access_token", token)
+	request.URL.RawQuery = query.Encode()
+	responseRecorder := httptest.NewRecorder()
+
+	router.ServeHTTP(responseRecorder, request)
+
+	if responseRecorder.Code != http.StatusUnauthorized {
+		t.Fatalf("expected query token to be rejected with 401, got %d", responseRecorder.Code)
+	}
+}
+
+func TestBindJSON_RejectsUnknownFields(t *testing.T) {
+	router, tokenMgr, user := setupTestServer()
+	token := authHeader(t, tokenMgr, user)
+	body := []byte(`{"title":"Known field","unexpected":"must fail"}`)
+	request := httptest.NewRequest(http.MethodPost, "/api/v1/tasks", bytes.NewReader(body))
+	request.Header.Set("Authorization", token)
+	request.Header.Set("Content-Type", "application/json")
+	responseRecorder := httptest.NewRecorder()
+
+	router.ServeHTTP(responseRecorder, request)
+
+	if responseRecorder.Code != http.StatusBadRequest {
+		t.Fatalf("expected unknown JSON field to return 400, got %d: %s", responseRecorder.Code, responseRecorder.Body.String())
+	}
+}
+
+func TestBindJSON_RejectsMultipleDocuments(t *testing.T) {
+	router, tokenMgr, user := setupTestServer()
+	token := authHeader(t, tokenMgr, user)
+	body := []byte(`{"title":"First"}{"title":"Second"}`)
+	request := httptest.NewRequest(http.MethodPost, "/api/v1/tasks", bytes.NewReader(body))
+	request.Header.Set("Authorization", token)
+	request.Header.Set("Content-Type", "application/json")
+	responseRecorder := httptest.NewRecorder()
+
+	router.ServeHTTP(responseRecorder, request)
+
+	if responseRecorder.Code != http.StatusBadRequest {
+		t.Fatalf("expected multiple JSON documents to return 400, got %d: %s", responseRecorder.Code, responseRecorder.Body.String())
+	}
+}
+
 func TestFlexibleDate_UnmarshalJSON(t *testing.T) {
 	type testPayload struct {
 		Date *FlexibleDate `json:"date"`
@@ -409,4 +457,3 @@ func TestFlexibleDate_UnmarshalJSON(t *testing.T) {
 		t.Fatalf("expected nil for null date, got %v", p3.Date)
 	}
 }
-

@@ -695,98 +695,98 @@ make build               # Build all binaries
 > **For AI Agents:** Update the status below as each item is completed. This is the source of truth for project progress.
 
 ### PHASE-0: Infrastructure & Bootstrap
-- [ ] **FEAT-001** Go module init, directory skeleton, `go.mod`
-- [ ] **FEAT-002** Docker Compose (PG, Redis, RabbitMQ, Elasticsearch)
-- [ ] **FEAT-003** Python AI service Dockerfile + docker-compose service
-- [ ] **FEAT-004** Config loader with validation (fail-fast on missing/unsafe values)
-- [ ] **FEAT-005** Structured slog logger setup
-- [ ] **FEAT-006** Database pool + `WithTx` helper + migration runner
-- [ ] **FEAT-007** Redis client setup
-- [ ] **FEAT-008** RabbitMQ connection + graceful shutdown
-- [ ] **FEAT-009** `/healthz` and `/readyz` endpoints
-- [ ] **FEAT-010** Makefile with all targets
-- [ ] **FEAT-011** Vite + React + TypeScript project init
-- [ ] **FEAT-012** Tailwind CSS + shadcn/ui + design tokens
-- [ ] **FEAT-013** i18n setup (vi, en, ja)
-- [ ] **FEAT-014** Base AppLayout (Glassmorphism, sidebar, topbar)
-- [ ] **FEAT-015** Common response helpers + domain errors
+- [x] **FEAT-001** Go module init, directory skeleton, `go.mod`
+- [x] **FEAT-002** Docker Compose (PG, Redis, RabbitMQ, Elasticsearch)
+- [ ] **FEAT-003** Python AI service Dockerfile + docker-compose service *(ai/ directory pending)*
+- [x] **FEAT-004** Config loader with validation (fail-fast on missing/unsafe values)
+- [x] **FEAT-005** Structured slog logger setup
+- [x] **FEAT-006** Database pool + `WithTx` helper + migration runner
+- [x] **FEAT-007** Redis client setup
+- [x] **FEAT-008** RabbitMQ connection + graceful shutdown
+- [x] **FEAT-009** `/healthz` and `/readyz` endpoints
+- [x] **FEAT-010** Makefile with all targets
+- [x] **FEAT-011** Vite + React + TypeScript project init
+- [x] **FEAT-012** Tailwind CSS + shadcn/ui + design tokens
+- [x] **FEAT-013** i18n setup (vi, en, ja)
+- [x] **FEAT-014** Base AppLayout (Glassmorphism, sidebar, topbar)
+- [x] **FEAT-015** Common response helpers + domain errors
 
 ### PHASE-1: IAM
-- [ ] **FEAT-101** `users` migration + repository
-- [ ] **FEAT-102** Registration endpoint
-- [ ] **FEAT-103** Login endpoint + JWT issuance
-- [ ] **FEAT-104** Refresh token rotation
-- [ ] **FEAT-105** Logout endpoint
-- [ ] **FEAT-106** JWT middleware
-- [ ] **FEAT-107** `/me` GET + PATCH
-- [ ] **FEAT-108** Rate limiting (Redis)
-- [ ] **FEAT-109** Auth UI (Login/Register pages, Axios interceptor, protected routes)
+- [x] **FEAT-101** `users` migration + repository
+- [x] **FEAT-102** Registration endpoint
+- [x] **FEAT-103** Login endpoint + JWT issuance
+- [x] **FEAT-104** Refresh token rotation
+- [x] **FEAT-105** Logout endpoint
+- [x] **FEAT-106** JWT middleware
+- [x] **FEAT-107** `/me` GET + PATCH
+- [x] **FEAT-108** Rate limiting (Redis)
+- [x] **FEAT-109** Auth UI (Login/Register pages, Axios interceptor, protected routes)
 
 ### PHASE-2: Deep Work
-- [ ] **FEAT-201** `tasks` migration + repository
-- [ ] **FEAT-202** Task CRUD endpoints
-- [ ] **FEAT-203** Kanban status/order management
-- [ ] **FEAT-204** Pomodoro Redis state management
-- [ ] **FEAT-205** Authenticated WebSocket `/ws/pomodoro`
-- [ ] **FEAT-206** `PomodoroFinished` event + worker history persistence
-- [ ] **FEAT-207** Task board UI (Kanban columns, drag support)
-- [ ] **FEAT-208** Pomodoro widget (global floating + detail view)
-- [ ] **FEAT-209** Today page (dashboard: active timer, next task, streak)
+- [x] **FEAT-201** `tasks` migration + repository
+- [x] **FEAT-202** Task CRUD endpoints
+- [x] **FEAT-203** Kanban status/order management
+- [x] **FEAT-204** Pomodoro Redis state management
+- [x] **FEAT-205** Authenticated WebSocket `/ws/pomodoro`
+- [x] **FEAT-206** `PomodoroFinished` event + worker history persistence
+- [x] **FEAT-207** Task board UI (Kanban columns, drag support)
+- [x] **FEAT-208** Pomodoro widget (global floating + detail view)
+- [x] **FEAT-209** Today page (dashboard: active timer, next task, streak)
 
 ### PHASE-3: Linguistics
-- [ ] **FEAT-301** Python AI service setup (FastAPI, health check)
-- [ ] **FEAT-302** TTS service (edge-tts, JP + EN voices, audio caching)
-- [ ] **FEAT-303** Vocabulary enrichment service (reading, example, translation)
-- [ ] **FEAT-304** `vocabularies` + `vocabulary_reviews` + `learning_sessions` migrations
-- [ ] **FEAT-305** Vocabulary CRUD endpoints
-- [ ] **FEAT-306** Bulk import (CSV/JSON)
-- [ ] **FEAT-307** Review queue endpoint (SM-2 due items)
-- [ ] **FEAT-308** Review submission + outbox event
-- [ ] **FEAT-309** Worker: idempotent SM-2 schedule update
-- [ ] **FEAT-310** Learning session start/end
-- [ ] **FEAT-311** Flashcard study mode UI (3D flip, keyboard)
-- [ ] **FEAT-312** Multiple choice quiz UI
-- [ ] **FEAT-313** Type-in practice UI (fuzzy match for kana/romaji)
-- [ ] **FEAT-314** Audio quiz UI (TTS playback)
-- [ ] **FEAT-315** Vocabulary list/management UI
-- [ ] **FEAT-316** Learning stats + mastery heatmap
+- [ ] **FEAT-301** Python AI service setup (FastAPI, health check) *(ai/ directory pending)*
+- [ ] **FEAT-302** TTS service (edge-tts, JP + EN voices, audio caching) *(ai/ directory pending)*
+- [ ] **FEAT-303** Vocabulary enrichment service (reading, example, translation) *(ai/ directory pending)*
+- [x] **FEAT-304** `vocabularies` + `vocabulary_reviews` + `learning_sessions` migrations
+- [x] **FEAT-305** Vocabulary CRUD endpoints
+- [x] **FEAT-306** Bulk import (CSV/JSON)
+- [x] **FEAT-307** Review queue endpoint (SM-2 due items)
+- [x] **FEAT-308** Review submission + outbox event
+- [x] **FEAT-309** Worker: idempotent SM-2 schedule update
+- [x] **FEAT-310** Learning session start/end
+- [x] **FEAT-311** Flashcard study mode UI (3D flip, keyboard)
+- [x] **FEAT-312** Multiple choice quiz UI
+- [x] **FEAT-313** Type-in practice UI (fuzzy match for kana/romaji)
+- [x] **FEAT-314** Audio quiz UI (TTS playback)
+- [x] **FEAT-315** Vocabulary list/management UI
+- [x] **FEAT-316** Learning stats + mastery heatmap
 
 ### PHASE-4: Personal Finance
 - [x] **FEAT-401** `accounts`, `categories`, `transactions`, `budgets`, `savings_goals` migrations
 - [x] **FEAT-402** Accounts CRUD endpoints
-- [ ] **FEAT-403** Categories CRUD endpoints (with default seed data)
+- [x] **FEAT-403** Categories CRUD endpoints (with default seed data)
 - [x] **FEAT-404** Transactions CRUD + filtering
-- [ ] **FEAT-405** Budgets CRUD + utilization endpoint
-- [ ] **FEAT-406** Savings goals CRUD
+- [x] **FEAT-405** Budgets CRUD + utilization endpoint
+- [x] **FEAT-406** Savings goals CRUD
 - [x] **FEAT-407** Finance analytics endpoints (dashboard, cashflow, by-category, net-worth)
-- [ ] **FEAT-408** Finance dashboard UI (net worth, cashflow chart, recent transactions)
-- [ ] **FEAT-409** Transaction list UI (filterable, searchable)
-- [ ] **FEAT-410** Transaction quick-add form (drawer/modal)
-- [ ] **FEAT-411** Budget management UI (progress bars, alerts)
-- [ ] **FEAT-412** Savings goals UI
-- [ ] **FEAT-413** Account management UI
+- [x] **FEAT-408** Finance dashboard UI (net worth, cashflow chart, recent transactions)
+- [x] **FEAT-409** Transaction list UI (filterable, searchable)
+- [x] **FEAT-410** Transaction quick-add form (drawer/modal)
+- [x] **FEAT-411** Budget management UI (progress bars, alerts)
+- [x] **FEAT-412** Savings goals UI
+- [x] **FEAT-413** Account management UI
 
 ### PHASE-5: Journal
-- [ ] **FEAT-501** Elasticsearch setup + journal index mapping
-- [ ] **FEAT-502** `journals` migration (incl. `search_vector` trigger, `linked_journal_ids`)
-- [ ] **FEAT-503** Journal CRUD endpoints
-- [ ] **FEAT-504** Full-text search endpoint (PG `search_vector` + date range + tags)
-- [ ] **FEAT-505** Elasticsearch semantic search integration (AI service embedding)
-- [ ] **FEAT-506** Journal linking endpoint
-- [ ] **FEAT-507** Journal stats endpoint (streak, word count, mood trend)
-- [ ] **FEAT-508** Journal editor UI (Markdown, autosave draft, preview)
-- [ ] **FEAT-509** Journal list UI (calendar heatmap, search, filters)
-- [ ] **FEAT-510** Journal detail/view UI (rendered Markdown, linked journals)
-- [ ] **FEAT-511** Mood + energy tracking UI
-- [ ] **FEAT-512** Writing streak widget
+- [ ] **FEAT-501** Elasticsearch setup + journal index mapping *(optional; PG FTS is primary)*
+- [x] **FEAT-502** `journals` migration (incl. `search_vector` trigger, `linked_journal_ids`)
+- [x] **FEAT-503** Journal CRUD endpoints
+- [x] **FEAT-504** Full-text search endpoint (PG `search_vector` + date range + tags)
+- [ ] **FEAT-505** Elasticsearch semantic search integration *(depends on AI service, optional)*
+- [x] **FEAT-506** Journal linking endpoint
+- [x] **FEAT-507** Journal stats endpoint (streak, word count, mood trend)
+- [x] **FEAT-508** Journal editor UI (Markdown, autosave draft, preview)
+- [x] **FEAT-509** Journal list UI (calendar heatmap, search, filters)
+- [x] **FEAT-510** Journal detail/view UI (rendered Markdown, linked journals)
+- [x] **FEAT-511** Mood + energy tracking UI
+- [x] **FEAT-512** Writing streak widget
 
 ### PHASE-6: Hardening
-- [ ] **FEAT-601** OpenTelemetry instrumentation
-- [ ] **FEAT-602** Integration test coverage for all critical paths
-- [ ] **FEAT-603** Playwright E2E tests
-- [ ] **FEAT-604** Production Docker build + deployment guide
-- [ ] **FEAT-605** Security review (CORS, rate limits, CSP headers)
-- [ ] **FEAT-606** Performance review (bundle size, DB indexes, query plans)
+- [ ] **FEAT-601** OpenTelemetry instrumentation *(roadmap)*
+- [x] **FEAT-602** Integration test coverage for all critical paths
+- [ ] **FEAT-603** Playwright E2E tests *(roadmap)*
+- [ ] **FEAT-604** Production Docker build + deployment guide *(roadmap)*
+- [x] **FEAT-605** Security review (CORS, rate limits, CSP headers)
+- [x] **FEAT-606** Performance review (bundle size, DB indexes, query plans)
 
 ---
 

@@ -26,6 +26,7 @@ import {
 } from "../hooks/use-tasks";
 import type { Task, TaskCategory, TaskInput, TaskPriority, TaskStatus } from "../types";
 import { cn } from "../../../lib/cn";
+import { toApiError } from "../../../lib/api-client";
 
 const columns: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
 
@@ -67,9 +68,9 @@ export function TasksPage() {
     try {
       await create.mutateAsync(input);
       setInput(defaults);
-    } catch (err: any) {
-      const apiMsg = err?.response?.data?.error?.message;
-      if (apiMsg && typeof apiMsg === "string" && !apiMsg.toLowerCase().includes("status code")) {
+    } catch (error: unknown) {
+      const apiMsg = toApiError(error).message;
+      if (!apiMsg.toLowerCase().includes("status code")) {
         setErrorMessage(apiMsg);
       } else {
         setErrorMessage(t("form.createFailed"));
@@ -136,6 +137,9 @@ export function TasksPage() {
         <form className="flex flex-col gap-2" onSubmit={submit}>
           <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto_auto_auto]">
             <input
+              aria-describedby={errorMessage ? "task-title-error" : undefined}
+              aria-invalid={errorMessage !== null}
+              aria-label={t("form.title")}
               className={cn(
                 "h-11 rounded-xl border px-4 text-sm text-foreground placeholder:text-muted-foreground outline-none transition",
                 errorMessage
@@ -151,11 +155,13 @@ export function TasksPage() {
               value={input.title}
             />
             <MacSelect
+              aria-label={t("form.priorityLabel")}
               onChange={(val) => setInput({ ...input, priority: val as TaskPriority })}
               options={priorityOptions}
               value={input.priority}
             />
             <MacSelect
+              aria-label={t("form.categoryLabel")}
               onChange={(val) => setInput({ ...input, category: val as TaskCategory })}
               options={categoryOptions}
               value={input.category}
@@ -183,7 +189,7 @@ export function TasksPage() {
             </ButtonInButton>
           </div>
           {errorMessage && (
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-500 dark:text-rose-400 px-1 pt-1 animate-in fade-in slide-in-from-top-1">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-500 dark:text-rose-400 px-1 pt-1 animate-in fade-in slide-in-from-top-1" id="task-title-error" role="alert">
               <AlertCircle size={14} className="shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -194,7 +200,7 @@ export function TasksPage() {
       {/* Kanban Board Columns */}
       <div className="grid gap-5 lg:grid-cols-3">
         {columns.map((colStatus) => {
-          const colTasks = (tasks.data ?? []).filter((t) => t.status === colStatus);
+          const colTasks = (tasks.data ?? []).filter((task) => task.status === colStatus);
           const label = t(`columns.${colStatus}`);
           const badgeColor = columnBadgeStyles[colStatus];
 

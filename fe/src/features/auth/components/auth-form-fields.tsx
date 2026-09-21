@@ -28,7 +28,7 @@ interface FieldProps {
 
 function Field({ label, error, children }: FieldProps) {
   const { t } = useTranslation();
-  const input = children as ReactElement<{ id: string; className?: string; "aria-describedby"?: string }>;
+  const input = children as ReactElement<{ id: string; className?: string; "aria-describedby"?: string; "aria-invalid"?: boolean }>;
   const describedBy = error === undefined ? undefined : `${input.props.id}-error`;
-  return <div><label className="mb-1.5 block text-sm font-medium text-foreground" htmlFor={input.props.id}>{label}</label>{cloneElement(input, { "aria-describedby": describedBy, className: "h-11 w-full rounded-xl border bg-white/70 px-3 text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary dark:bg-slate-900/70" })}{error === undefined ? null : <p className="mt-1 text-sm text-red-600 dark:text-red-400" id={describedBy}>{t(error)}</p>}</div>;
+  return <div><label className="mb-1.5 block text-sm font-medium text-foreground" htmlFor={input.props.id}>{label}</label>{cloneElement(input, { "aria-describedby": describedBy, "aria-invalid": error !== undefined, className: "h-11 w-full rounded-xl border bg-white/70 px-3 text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary dark:bg-slate-900/70" })}{error === undefined ? null : <p className="mt-1 text-sm text-red-600 dark:text-red-400" id={describedBy} role="alert">{t(error)}</p>}</div>;
 }

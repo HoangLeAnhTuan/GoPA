@@ -1,12 +1,16 @@
 package http
 
 import (
+	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/google/uuid"
 	"gopa/internal/core/domain"
 	"gopa/pkg/utils/response"
@@ -27,7 +31,19 @@ func parseParamUUID(c *gin.Context, param string) (uuid.UUID, bool) {
 }
 
 func bindJSON(c *gin.Context, target any) bool {
-	if err := c.ShouldBindJSON(target); err != nil {
+	const maxJSONBodyBytes = 1 << 20
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, maxJSONBodyBytes)
+	decoder := json.NewDecoder(c.Request.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(target); err != nil {
+		response.Fail(c, domain.ErrValidation)
+		return false
+	}
+	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
+		response.Fail(c, domain.ErrValidation)
+		return false
+	}
+	if err := binding.Validator.ValidateStruct(target); err != nil {
 		response.Fail(c, domain.ErrValidation)
 		return false
 	}
@@ -77,4 +93,3 @@ func (fd *FlexibleDate) Time() *time.Time {
 	t := time.Time(*fd)
 	return &t
 }
-

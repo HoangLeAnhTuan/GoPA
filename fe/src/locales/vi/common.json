@@ -13,6 +13,9 @@
     "theme": "Chuyển giao diện màu",
     "toggleSidebar": "Thu gọn thanh bên",
     "openNavigation": "Mở điều hướng",
+    "closeNavigation": "Đóng điều hướng",
+    "closeDialog": "Đóng hộp thoại",
+    "skipToContent": "Chuyển đến nội dung chính",
     "search": "Tìm kiếm...",
     "searchAria": "Tìm kiếm GoPA (Ctrl K)"
   },

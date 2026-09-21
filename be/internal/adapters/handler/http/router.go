@@ -24,7 +24,7 @@ func NewRouter(
 	limiter ports.RateLimiter,
 ) *gin.Engine {
 	router := gin.New()
-	router.Use(gin.Recovery(), RequestID(), RequestLogger(logger), CORS(webOrigin))
+	router.Use(gin.Recovery(), RequestID(), SecurityHeaders(), RequestLogger(logger), CORS(webOrigin))
 	if health != nil {
 		health.RegisterRoutes(router)
 	}

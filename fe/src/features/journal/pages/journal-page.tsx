@@ -18,6 +18,7 @@ import {
   useUpdateJournal,
 } from "../hooks/use-journals";
 import type { Journal, JournalMood } from "../types";
+import { toApiError } from "../../../lib/api-client";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -162,9 +163,9 @@ export function JournalPage() {
       }
       setSuccessMessage(t("form.saveSuccess"));
       setTimeout(() => setSuccessMessage(null), 3500);
-    } catch (err: any) {
-      const apiMsg = err?.response?.data?.error?.message;
-      if (apiMsg && typeof apiMsg === "string" && !apiMsg.toLowerCase().includes("status code")) {
+    } catch (error: unknown) {
+      const apiMsg = toApiError(error).message;
+      if (!apiMsg.toLowerCase().includes("status code")) {
         setSubmitError(apiMsg);
       } else {
         setSubmitError(t("form.saveFailed"));
@@ -209,7 +210,7 @@ export function JournalPage() {
   };
 
   if (journalsQ.isPending && !journalsQ.data) return <LoadingState />;
-  if (journalsQ.isError) return <ErrorState />;
+  if (journalsQ.isError) return <ErrorState onRetry={() => void journalsQ.refetch()} />;
 
   const availableToLink = (allQ.data ?? []).filter((j) => j.id !== selectedId);
 
@@ -236,7 +237,7 @@ export function JournalPage() {
                 actions={
                   <button
                     id="journal-new-entry-btn"
-                    className="h-10 items-center justify-center rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 text-xs font-bold text-slate-950 shadow-md shadow-amber-500/30 transition-all hover:from-amber-400 hover:to-orange-400 hover:scale-[1.02] hover:shadow-lg hover:shadow-amber-500/35 flex items-center gap-2"
+                    className="min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 text-xs font-bold text-slate-950 shadow-md shadow-amber-500/30 transition-all hover:from-amber-400 hover:to-orange-400 hover:scale-[1.02] hover:shadow-lg hover:shadow-amber-500/35 flex items-center gap-2"
                     onClick={resetForNew}
                     type="button"
                   >

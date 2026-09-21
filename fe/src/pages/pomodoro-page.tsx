@@ -24,20 +24,7 @@ export function PomodoroPage() {
   const { status: wsStatus } = usePomodoroWs();
   const { data: historyItems } = usePomodoroHistory(5);
 
-  const normalizedHistory = useMemo(() => {
-    if (!historyItems || !Array.isArray(historyItems)) return [];
-    return historyItems.map((item: any) => {
-      const dur = typeof item.duration_seconds === "number"
-        ? item.duration_seconds
-        : (typeof item.DurationSeconds === "number" ? item.DurationSeconds : 1500);
-      const end = item.ended_at || item.EndedAt || item.started_at || item.StartedAt || new Date().toISOString();
-      return {
-        id: String(item.id || item.ID || Math.random()),
-        duration_seconds: dur,
-        ended_at: end,
-      };
-    });
-  }, [historyItems]);
+  const normalizedHistory = useMemo(() => historyItems ?? [], [historyItems]);
 
   const todayHistory = useMemo(() => {
     const today = new Date().toDateString();

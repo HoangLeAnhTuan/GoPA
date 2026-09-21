@@ -115,7 +115,7 @@ export function MacSelect({
         aria-haspopup="listbox"
         aria-label={ariaLabel || placeholder}
         className={cn(
-          "group flex min-h-10 w-full items-center justify-between gap-3 rounded-xl border border-white/40 bg-white/70 px-3.5 text-sm font-medium text-foreground shadow-sm backdrop-blur-xl transition hover:border-white/60 hover:bg-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:border-white/10 dark:bg-slate-900/70 dark:hover:border-white/20 dark:hover:bg-slate-900/90",
+          "group flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border border-white/40 bg-white/70 px-3.5 text-sm font-medium text-foreground shadow-sm backdrop-blur-xl transition hover:border-white/60 hover:bg-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:border-white/10 dark:bg-slate-900/70 dark:hover:border-white/20 dark:hover:bg-slate-900/90",
           disabled && "cursor-not-allowed opacity-50",
           triggerClassName
         )}
@@ -163,7 +163,7 @@ export function MacSelect({
                       <button
                         aria-selected={isSelected}
                         className={cn(
-                          "flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm transition-colors",
+                          "flex min-h-11 w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm transition-colors",
                           isSelected
                             ? "bg-primary text-primary-foreground font-semibold"
                             : "text-foreground hover:bg-slate-200/70 dark:hover:bg-slate-800/80"
